@@ -60,7 +60,7 @@ class RedisRateLimiter {
 }
 
 // 4 requests per day per IP
-export const rateLimiter = new RedisRateLimiter(4, 24 * 60 * 60 * 1000); // Updated to 4 requests per 24 hours
+export const rateLimiter = new RedisRateLimiter(25, 24 * 60 * 60 * 1000); // Updated to 4 requests per 24 hours
 
 // Helper function to get client IP
 export function getClientIP(request: Request): string {
