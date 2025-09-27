@@ -49,7 +49,7 @@ class RedisRateLimiter {
         };
       }
     } catch (error) {
-      console.error("[v0] Redis rate limiter error:", error);
+      console.error("weDat Redis rate limiter error:", error);
       return {
         allowed: true,
         resetTime,

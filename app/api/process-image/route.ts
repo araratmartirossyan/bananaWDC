@@ -1,11 +1,11 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { fal } from "@fal-ai/client"
-import { rateLimiter, getClientIP } from "@/lib/rate-limiter"
+import { type NextRequest, NextResponse } from "next/server";
+import { fal } from "@fal-ai/client";
+import { rateLimiter, getClientIP } from "@/lib/rate-limiter";
 
 // Configure fal client
 fal.config({
   credentials: process.env.FAL_KEY,
-})
+});
 
 const filterConfigs = {
   acid: {
@@ -100,15 +100,15 @@ const filterConfigs = {
     prompt:
       "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with vibrant 1970s disco fever aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add authentic disco fashion with realistic sequined fabrics and metallic textures, genuine platform shoes and bell-bottom pants, maintain exact facial features with realistic disco ball lighting and colorful reflections. For LANDSCAPES: Transform into photorealistic disco club environments with authentic mirror ball effects, realistic dance floor lighting, genuine 70s interior design with period-accurate materials. For OBJECTS: Add authentic disco elements with realistic mirror ball reflections, genuine vinyl records and period-correct audio equipment, maintain exact proportions with believable 70s craftsmanship. For FOOD: Present with authentic 70s presentation using period-accurate serving methods, realistic cocktail presentations with disco lighting effects. For ANIMALS: Add realistic disco context with authentic 70s party environment, maintain anatomically correct animal features. CRITICAL: Must look like an actual photograph taken at a real 1970s disco club, with authentic period materials, realistic disco lighting physics, and perfect 70s party photography quality.",
   },
-}
+};
 
 export async function POST(request: NextRequest) {
   try {
-    const clientIP = getClientIP(request)
-    const rateLimitResult = await rateLimiter.isAllowed(clientIP)
+    const clientIP = getClientIP(request);
+    const rateLimitResult = await rateLimiter.isAllowed(clientIP);
 
     if (!rateLimitResult.allowed) {
-      const resetTime = new Date(rateLimitResult.resetTime || 0).toISOString()
+      const resetTime = new Date(rateLimitResult.resetTime || 0).toISOString();
       return NextResponse.json(
         {
           error: "Rate limit exceeded. Please try again later.",
@@ -121,16 +121,21 @@ export async function POST(request: NextRequest) {
             "X-RateLimit-Limit": "10",
             "X-RateLimit-Remaining": "0",
             "X-RateLimit-Reset": resetTime,
-            "Retry-After": Math.ceil((rateLimitResult.resetTime! - Date.now()) / 1000).toString(),
+            "Retry-After": Math.ceil(
+              (rateLimitResult.resetTime! - Date.now()) / 1000
+            ).toString(),
           },
-        },
-      )
+        }
+      );
     }
 
-    const { imageUrl, filter } = await request.json()
+    const { imageUrl, filter } = await request.json();
 
     if (!imageUrl || !filter) {
-      return NextResponse.json({ error: "Image URL and filter are required" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Image URL and filter are required" },
+        { status: 400 }
+      );
     }
 
     if (filter === "none") {
@@ -139,20 +144,23 @@ export async function POST(request: NextRequest) {
         {
           headers: {
             "X-RateLimit-Limit": "10",
-            "X-RateLimit-Remaining": rateLimitResult.remaining?.toString() || "0",
-            "X-RateLimit-Reset": new Date(rateLimitResult.resetTime || 0).toISOString(),
+            "X-RateLimit-Remaining":
+              rateLimitResult.remaining?.toString() || "0",
+            "X-RateLimit-Reset": new Date(
+              rateLimitResult.resetTime || 0
+            ).toISOString(),
           },
-        },
-      )
+        }
+      );
     }
 
-    const config = filterConfigs[filter as keyof typeof filterConfigs]
+    const config = filterConfigs[filter as keyof typeof filterConfigs];
     if (!config) {
-      return NextResponse.json({ error: "Invalid filter" }, { status: 400 })
+      return NextResponse.json({ error: "Invalid filter" }, { status: 400 });
     }
 
-    console.log("[v0] Processing image with Nano Banana:", filter)
-    console.log("[v0] Using dramatic transformation prompt")
+    console.log("weDat Processing image with Nano Banana:", filter);
+    console.log("weDat Using dramatic transformation prompt");
 
     const result = await fal.subscribe("fal-ai/nano-banana/edit", {
       input: {
@@ -160,17 +168,17 @@ export async function POST(request: NextRequest) {
         image_urls: [imageUrl],
         num_images: 1,
       },
-    })
+    });
 
-    console.log("[v0] Nano Banana transformation result:", result)
+    console.log("weDat Nano Banana transformation result:", result);
 
-    const processedImageUrl = result.data?.images?.[0]?.url
+    const processedImageUrl = result.data?.images?.[0]?.url;
 
     if (!processedImageUrl) {
-      throw new Error("No processed image returned from Nano Banana")
+      throw new Error("No processed image returned from Nano Banana");
     }
 
-    console.log("[v0] Returning processed image without watermark")
+    console.log("weDat Returning processed image without watermark");
 
     return NextResponse.json(
       {
@@ -180,18 +188,20 @@ export async function POST(request: NextRequest) {
         headers: {
           "X-RateLimit-Limit": "10",
           "X-RateLimit-Remaining": rateLimitResult.remaining?.toString() || "0",
-          "X-RateLimit-Reset": new Date(rateLimitResult.resetTime || 0).toISOString(),
+          "X-RateLimit-Reset": new Date(
+            rateLimitResult.resetTime || 0
+          ).toISOString(),
         },
-      },
-    )
+      }
+    );
   } catch (error) {
-    console.error("[v0] Error with Nano Banana processing:", error)
+    console.error("weDat Error with Nano Banana processing:", error);
     return NextResponse.json(
       {
         error: "Failed to process image with Nano Banana",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
-    )
+      { status: 500 }
+    );
   }
 }

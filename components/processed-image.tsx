@@ -1,15 +1,15 @@
-"use client"
-import { LiquidGlass } from "./liquid-glass"
-import { Sparkles, Download, RotateCcw, X } from "lucide-react" // removed Share import
+"use client";
+import { LiquidGlass } from "./liquid-glass";
+import { Sparkles, Download, RotateCcw, X } from "lucide-react"; // removed Share import
 
 interface ProcessedImageProps {
-  originalImage: string
-  processedImage: string | null
-  isProcessing: boolean
-  filterName: string
-  onReset: () => void
-  onDownload: () => void
-  isFrontCamera: boolean
+  originalImage: string;
+  processedImage: string | null;
+  isProcessing: boolean;
+  filterName: string;
+  onReset: () => void;
+  onDownload: () => void;
+  isFrontCamera: boolean;
 }
 
 export function ProcessedImage({
@@ -21,21 +21,21 @@ export function ProcessedImage({
   onDownload,
   isFrontCamera,
 }: ProcessedImageProps) {
-  const showProcessedImage = !!processedImage
-  const showOriginalImage = !processedImage
+  const showProcessedImage = !!processedImage;
+  const showOriginalImage = !processedImage;
 
   const handleDownload = () => {
     if (processedImage) {
-      const link = document.createElement("a")
-      link.href = processedImage
-      link.download = `bananacam-${filterName}-${Date.now()}.jpg`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      const link = document.createElement("a");
+      link.href = processedImage;
+      link.download = `bananacam-${filterName}-${Date.now()}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } else {
-      onDownload()
+      onDownload();
     }
-  }
+  };
 
   return (
     <div className="h-full w-full relative bg-black">
@@ -45,7 +45,9 @@ export function ProcessedImage({
           <img
             src={originalImage || "/placeholder.svg"}
             alt="Original photo"
-            className={`w-full h-full object-cover ${isProcessing ? "blur-md" : ""}`}
+            className={`w-full h-full object-cover ${
+              isProcessing ? "blur-md" : ""
+            }`}
           />
         )}
 
@@ -54,10 +56,12 @@ export function ProcessedImage({
             src={processedImage || "/placeholder.svg"}
             alt="Processed photo with watermark"
             className="w-full h-full object-cover"
-            onLoad={() => console.log("[v0] Processed image rendered successfully")}
+            onLoad={() =>
+              console.log("weDat Processed image rendered successfully")
+            }
             onError={(e) => {
-              console.log("[v0] Error rendering processed image:", e)
-              console.log("[v0] Image src:", processedImage)
+              console.log("weDat Error rendering processed image:", e);
+              console.log("weDat Image src:", processedImage);
             }}
           />
         )}
@@ -70,12 +74,15 @@ export function ProcessedImage({
                   className="h-full bg-white rounded-full"
                   style={{
                     animation: "shimmer 2s ease-in-out infinite",
-                    background: "linear-gradient(90deg, transparent, white, transparent)",
+                    background:
+                      "linear-gradient(90deg, transparent, white, transparent)",
                     backgroundSize: "200% 100%",
                   }}
                 />
               </div>
-              <p className="text-white/80 font-medium">Processing with {filterName}...</p>
+              <p className="text-white/80 font-medium">
+                Processing with {filterName}...
+              </p>
             </div>
           </div>
         )}
@@ -126,5 +133,5 @@ export function ProcessedImage({
         )}
       </div>
     </div>
-  )
+  );
 }

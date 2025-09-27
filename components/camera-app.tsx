@@ -1,8 +1,8 @@
-"use client"
-import { useState, useCallback } from "react"
-import { CameraCapture } from "./camera-capture"
-import { ProcessedImage } from "./processed-image"
-import { addWatermark } from "../lib/watermark"
+"use client";
+import { useState, useCallback } from "react";
+import { CameraCapture } from "./camera-capture";
+import { ProcessedImage } from "./processed-image";
+import { addWatermark } from "../lib/watermark";
 
 export type FilterType =
   | "none"
@@ -27,13 +27,13 @@ export type FilterType =
   | "spy"
   | "gothic"
   | "90s"
-  | "disco"
+  | "disco";
 
 export interface Filter {
-  id: FilterType
-  name: string
-  description: string
-  prompt: string
+  id: FilterType;
+  name: string;
+  description: string;
+  prompt: string;
 }
 
 const filters: Filter[] = [
@@ -127,38 +127,47 @@ const filters: Filter[] = [
     prompt:
       "Transform people into disco dancers: men in wide-collar shirts, bell-bottom pants, gold chains, afro hairstyles, platform shoes; women in sequined dresses, feathered hair, bold makeup, metallic fabrics, go-go boots, large hoop earrings. Add disco environment: mirror balls, colorful dance floors, neon lights, vinyl records, DJ booths, retro furniture, lava lamps, psychedelic patterns, disco balls reflecting light, dance platforms, vintage microphones. Apply dynamic multicolored lighting with sparkles, reflections, and groovy dance floor atmosphere.",
   },
-]
+];
 
 export function CameraApp() {
-  const [selectedFilterIndex, setSelectedFilterIndex] = useState(0)
-  const [capturedImage, setCapturedImage] = useState<string | null>(null)
-  const [processedImage, setProcessedImage] = useState<string | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [capturedWithFrontCamera, setCapturedWithFrontCamera] = useState(false)
+  const [selectedFilterIndex, setSelectedFilterIndex] = useState(0);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [capturedWithFrontCamera, setCapturedWithFrontCamera] = useState(false);
 
-  const selectedFilter = filters[selectedFilterIndex]
+  const selectedFilter = filters[selectedFilterIndex];
 
   const handleCapture = useCallback(
     async (imageDataUrl: string, facingMode: "user" | "environment") => {
-      setCapturedImage(imageDataUrl)
-      setProcessedImage(null)
-      setCapturedWithFrontCamera(facingMode === "user")
+      setCapturedImage(imageDataUrl);
+      setProcessedImage(null);
+      setCapturedWithFrontCamera(facingMode === "user");
 
       if (selectedFilter.id === "none") {
         try {
-          const watermarkedImage = await addWatermark(imageDataUrl, facingMode === "user")
-          setProcessedImage(watermarkedImage)
+          const watermarkedImage = await addWatermark(
+            imageDataUrl,
+            facingMode === "user"
+          );
+          setProcessedImage(watermarkedImage);
         } catch (error) {
-          console.error("[v0] Error adding watermark to original image:", error)
-          setProcessedImage(imageDataUrl)
+          console.error(
+            "weDat Error adding watermark to original image:",
+            error
+          );
+          setProcessedImage(imageDataUrl);
         }
-        return
+        return;
       }
 
-      setIsProcessing(true)
+      setIsProcessing(true);
 
       try {
-        console.log("[v0] Starting image processing with filter:", selectedFilter.id)
+        console.log(
+          "weDat Starting image processing with filter:",
+          selectedFilter.id
+        );
         const response = await fetch("/api/process-image", {
           method: "POST",
           headers: {
@@ -168,128 +177,147 @@ export function CameraApp() {
             imageUrl: imageDataUrl,
             filter: selectedFilter.id,
           }),
-        })
+        });
 
-        console.log("[v0] API response status:", response.status)
+        console.log("weDat API response status:", response.status);
 
         if (!response.ok) {
-          const errorText = await response.text()
-          console.log("[v0] API error response:", errorText)
-          throw new Error(`Error processing image: ${response.status} ${errorText}`)
+          const errorText = await response.text();
+          console.log("weDat API error response:", errorText);
+          throw new Error(
+            `Error processing image: ${response.status} ${errorText}`
+          );
         }
 
-        const data = await response.json()
-        console.log("[v0] API response data:", data)
+        const data = await response.json();
+        console.log("weDat API response data:", data);
 
         if (data.processedImageUrl) {
-          console.log("[v0] Setting processed image URL:", data.processedImageUrl)
+          console.log(
+            "weDat Setting processed image URL:",
+            data.processedImageUrl
+          );
 
           try {
-            console.log("[v0] Adding watermark to processed image")
-            const watermarkedImage = await addWatermark(data.processedImageUrl, facingMode === "user")
-            console.log("[v0] Watermark applied successfully")
-            setProcessedImage(watermarkedImage)
-            setIsProcessing(false)
+            console.log("weDat Adding watermark to processed image");
+            const watermarkedImage = await addWatermark(
+              data.processedImageUrl,
+              facingMode === "user"
+            );
+            console.log("weDat Watermark applied successfully");
+            setProcessedImage(watermarkedImage);
+            setIsProcessing(false);
           } catch (watermarkError) {
-            console.error("[v0] Error adding watermark:", watermarkError)
-            setProcessedImage(data.processedImageUrl)
-            setIsProcessing(false)
+            console.error("weDat Error adding watermark:", watermarkError);
+            setProcessedImage(data.processedImageUrl);
+            setIsProcessing(false);
           }
 
-          const img = new Image()
-          img.crossOrigin = "anonymous"
+          const img = new Image();
+          img.crossOrigin = "anonymous";
           img.onload = () => {
-            console.log("[v0] Processed image loaded successfully")
-          }
+            console.log("weDat Processed image loaded successfully");
+          };
           img.onerror = (error) => {
-            console.log("[v0] Error loading processed image:", error)
-            console.log("[v0] Falling back to original image")
+            console.log("weDat Error loading processed image:", error);
+            console.log("weDat Falling back to original image");
             addWatermark(imageDataUrl, facingMode === "user")
               .then((watermarkedFallback) => {
-                setProcessedImage(watermarkedFallback)
-                setIsProcessing(false)
+                setProcessedImage(watermarkedFallback);
+                setIsProcessing(false);
               })
               .catch(() => {
-                setProcessedImage(imageDataUrl)
-                setIsProcessing(false)
-              })
-          }
-          img.src = data.processedImageUrl
+                setProcessedImage(imageDataUrl);
+                setIsProcessing(false);
+              });
+          };
+          img.src = data.processedImageUrl;
         } else {
-          console.log("[v0] No processed image URL in response, using original with watermark")
+          console.log(
+            "weDat No processed image URL in response, using original with watermark"
+          );
           try {
-            const watermarkedImage = await addWatermark(imageDataUrl, facingMode === "user")
-            setProcessedImage(watermarkedImage)
+            const watermarkedImage = await addWatermark(
+              imageDataUrl,
+              facingMode === "user"
+            );
+            setProcessedImage(watermarkedImage);
           } catch (error) {
-            console.error("[v0] Error adding watermark to fallback:", error)
-            setProcessedImage(imageDataUrl)
+            console.error("weDat Error adding watermark to fallback:", error);
+            setProcessedImage(imageDataUrl);
           }
-          setIsProcessing(false)
+          setIsProcessing(false);
         }
       } catch (error) {
-        console.error("[v0] Error processing image:", error)
+        console.error("weDat Error processing image:", error);
         try {
-          const watermarkedImage = await addWatermark(imageDataUrl, facingMode === "user")
-          setProcessedImage(watermarkedImage)
+          const watermarkedImage = await addWatermark(
+            imageDataUrl,
+            facingMode === "user"
+          );
+          setProcessedImage(watermarkedImage);
         } catch (watermarkError) {
-          console.error("[v0] Error adding watermark to error fallback:", watermarkError)
-          setProcessedImage(imageDataUrl)
+          console.error(
+            "weDat Error adding watermark to error fallback:",
+            watermarkError
+          );
+          setProcessedImage(imageDataUrl);
         }
-        setIsProcessing(false)
+        setIsProcessing(false);
       }
     },
-    [selectedFilter],
-  )
+    [selectedFilter]
+  );
 
   const handleReset = () => {
-    setCapturedImage(null)
-    setProcessedImage(null)
-    setIsProcessing(false)
-    setCapturedWithFrontCamera(false)
-  }
+    setCapturedImage(null);
+    setProcessedImage(null);
+    setIsProcessing(false);
+    setCapturedWithFrontCamera(false);
+  };
 
   const handleDownload = () => {
-    if (!processedImage) return
+    if (!processedImage) return;
 
     try {
       if (processedImage.startsWith("data:")) {
-        const byteCharacters = atob(processedImage.split(",")[1])
-        const byteNumbers = new Array(byteCharacters.length)
+        const byteCharacters = atob(processedImage.split(",")[1]);
+        const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i)
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
-        const byteArray = new Uint8Array(byteNumbers)
-        const blob = new Blob([byteArray], { type: "image/jpeg" })
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "image/jpeg" });
 
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement("a")
-        link.href = url
-        link.download = `filtered-photo-${selectedFilter.id}-${Date.now()}.jpg`
-        link.style.display = "none"
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `filtered-photo-${selectedFilter.id}-${Date.now()}.jpg`;
+        link.style.display = "none";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
-        setTimeout(() => URL.revokeObjectURL(url), 100)
+        setTimeout(() => URL.revokeObjectURL(url), 100);
       } else {
-        const link = document.createElement("a")
-        link.href = processedImage
-        link.download = `filtered-photo-${selectedFilter.id}-${Date.now()}.jpg`
-        link.style.display = "none"
-        link.setAttribute("target", "_self")
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        const link = document.createElement("a");
+        link.href = processedImage;
+        link.download = `filtered-photo-${selectedFilter.id}-${Date.now()}.jpg`;
+        link.style.display = "none";
+        link.setAttribute("target", "_self");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
     } catch (error) {
-      console.error("Download failed:", error)
-      window.location.href = processedImage
+      console.error("Download failed:", error);
+      window.location.href = processedImage;
     }
-  }
+  };
 
   const handleFilterSelect = (index: number) => {
-    setSelectedFilterIndex(index)
-  }
+    setSelectedFilterIndex(index);
+  };
 
   return (
     <div
@@ -316,5 +344,5 @@ export function CameraApp() {
         />
       )}
     </div>
-  )
+  );
 }
