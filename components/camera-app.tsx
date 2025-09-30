@@ -7,6 +7,9 @@ import { addWatermark } from "../lib/watermark";
 export type FilterType =
   | "none"
   | "acid"
+  | "gta"
+  | "samurai"
+  | "car_mechanic"
   | "vintage"
   | "cyberpunk"
   | "underwater"
@@ -14,6 +17,7 @@ export type FilterType =
   | "apocalypse"
   | "steampunk"
   | "tropical"
+  | "space"
   | "winter"
   | "neon_tokyo"
   | "wild_west"
@@ -44,88 +48,102 @@ const filters: Filter[] = [
     prompt: "",
   },
   {
-    id: "art_deco",
-    name: "Art Deco",
-    description: "1920s glamour",
+    id: "acid",
+    name: "Acid",
+    description: "Psychedelic acid trip",
     prompt:
-      "Transform people with elegant 1920s fashion: men in sharp three-piece suits with bow ties, suspenders, and fedora hats; women in drop-waist beaded dresses, long pearl necklaces, feathered headbands, and T-bar shoes. Add Art Deco environment: geometric patterns on walls, gold and black color schemes, elegant curved lines, stylized sunburst designs, ornate mirrors, crystal chandeliers, marble columns, decorative metalwork, vintage automobiles, jazz age accessories. Apply sophisticated golden lighting with luxurious atmosphere.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with psychedelic acid trip aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Apply flowing tie-dye patterns to clothing with photorealistic fabric textures, rainbow color shifts in hair maintaining natural hair physics, kaleidoscope reflections in eyes with anatomically correct eye structure, preserve exact facial features and natural skin textures while adding subtle color morphing effects that look like real light refraction. For LANDSCAPES: Transform sky into swirling rainbow patterns with realistic cloud formations, add flowing color waves across terrain maintaining geological accuracy, create fractal patterns in trees/mountains with photorealistic bark and rock textures, preserve natural lighting physics and atmospheric perspective. For OBJECTS: Add rainbow color shifts with realistic material properties, create kaleidoscope reflections following real optical laws, maintain exact object proportions and surface textures. For FOOD: Add colorful swirling patterns while preserving realistic food textures, moisture, and natural food physics. For ANIMALS: Add colorful fur/feather patterns with anatomically correct animal features, realistic fur/feather physics. CRITICAL: Maintain photorealistic lighting, shadows, reflections, and material properties. Result must look like a real photograph taken with professional camera equipment, not digital art or illustration.",
   },
   {
-    id: "cyberpunk",
-    name: "Cyberpunk",
-    description: "Futuristic",
+    id: "space",
+    name: "Space",
+    description: "NASA space mission",
     prompt:
-      "Transform people into cyberpunk characters: futuristic clothing with LED strips, leather jackets with neon accents, cybernetic implants, glowing tattoos, colored contact lenses, punk hairstyles with neon highlights, tech accessories, augmented reality visors, metallic jewelry. Add cyberpunk environment: neon signs with Japanese text, holographic displays, futuristic buildings, flying cars, digital billboards, chrome pipes, circuit patterns on walls, glowing cables, rain effects. Apply purple and cyan neon lighting with digital glitches.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with authentic NASA space mission aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Transform into authentic astronauts wearing photorealistic NASA EMU (Extravehicular Mobility Unit) space suits with accurate white thermal micrometeoroid garment, realistic gold-tinted helmet visors reflecting Earth and stars, authentic NASA mission patches (Apollo, Artemis, ISS), genuine life support backpack (PLSS) with realistic tubes and connections, accurate space gloves with fingertip lights, realistic communication headset visible inside helmet, authentic NASA name tags and flag patches. Add realistic space suit physics with proper pressurization appearance, authentic fabric textures and wear patterns from actual space missions. For LANDSCAPES: Transform into photorealistic International Space Station interior with accurate control panels, authentic NASA equipment, realistic floating objects in zero gravity, genuine Earth view through cupola windows showing accurate continental geography, realistic LED lighting systems, authentic cable management and handholds. Or create realistic lunar surface with accurate regolith texture, authentic lunar module components, realistic Earth rising over lunar horizon with correct astronomical positioning, genuine NASA equipment scattered realistically. For OBJECTS: Transform into authentic NASA space equipment with realistic materials - titanium, aluminum, Kevlar textures, accurate mission control interfaces, genuine space food packaging, realistic scientific instruments with authentic NASA branding and serial numbers. CRITICAL: Must look like actual NASA mission photography from ISS, Apollo, or Artemis programs. Use authentic space agency aesthetics, realistic zero-gravity physics, accurate astronomical lighting, and genuine NASA equipment details. Perfect space documentary photography quality with authentic mission patch integration and realistic space suit weathering from actual EVA use.",
   },
   {
-    id: "wild_west",
-    name: "Wild West",
-    description: "Cowboy frontier",
+    id: "gta",
+    name: "GTA",
+    description: "Grand Theft Auto",
     prompt:
-      "Transform people into cowboys and frontier folk: men in cowboy hats, leather chaps, boots with spurs, bandanas, sheriff badges, gun holsters; women in prairie dresses, bonnets, leather boots, fringed jackets. Add wild west environment: desert cacti, tumbleweeds, old wooden saloons, horse-drawn wagons, wanted posters on walls, oil lamps, wooden barrels, desert mountains in background, vultures circling, dust storms, rustic fences. Apply warm desert tones with dramatic sunset lighting.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Grand Theft Auto aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistic GTA clothing with authentic fabric textures and wear patterns, maintain exact facial features with realistic GTA lighting and natural skin tones. For LANDSCAPES: Transform into photorealistic GTA scenes with authentic GTA buildings and environments, maintain natural GTA lighting physics and atmospheric perspective. For OBJECTS: Add realistic GTA materials with authentic GTA textures and wear patterns, maintain exact proportions with believable GTA weathering. For FOOD: Present authentic GTA cuisine with realistic GTA textures and wear patterns, maintain natural GTA food physics. For ANIMALS: Add realistic GTA animals with authentic GTA textures and wear patterns, maintain anatomically correct features with believable GTA environment interactions. CRITICAL: Must look like an actual GTA photograph taken with professional equipment, with authentic GTA lighting, realistic GTA conditions, and perfect GTA photography quality.",
   },
   {
-    id: "vintage",
-    name: "Vintage",
-    description: "Retro vibes",
+    id: "car_mechanic",
+    name: "Car Mechanic",
+    description: "Car mechanic",
     prompt:
-      "Transform people with vintage 1950s style: men in high-waisted trousers, suspenders, bow ties, rolled sleeves, pompadour hairstyles; women in circle skirts, petticoats, cardigans, victory rolls, red lipstick, cat-eye glasses. Add vintage environment: classic diners, jukeboxes, vintage cars, checkered floors, neon signs, milkshake bars, drive-in theaters, retro furniture. Apply warm sepia tones with soft vintage lighting.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with car mechanic aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistic car mechanic clothing with authentic fabric textures and wear patterns, maintain exact facial features with realistic car mechanic lighting and natural skin tones. For LANDSCAPES: Transform into photorealistic car mechanic scenes with authentic car mechanic buildings and environments, maintain natural car mechanic lighting physics and atmospheric perspective. For OBJECTS: Add realistic car mechanic materials with authentic car mechanic textures and wear patterns, maintain exact proportions with believable car mechanic weathering. For FOOD: Present authentic car mechanic cuisine with realistic car mechanic textures and wear patterns, maintain natural car mechanic food physics. For ANIMALS: Add realistic car mechanic animals with authentic car mechanic textures and wear patterns, maintain anatomically correct features with believable car mechanic environment interactions. CRITICAL: Must look like an actual car mechanic photograph taken with professional equipment, with authentic car mechanic lighting, realistic car mechanic conditions, and perfect car mechanic photography quality.",
   },
   {
-    id: "underwater",
-    name: "Underwater",
-    description: "Ocean depths",
+    id: "apocalypse",
+    name: "Apocalypse",
+    description: "Post-apocalyptic survival",
     prompt:
-      "Transform people into underwater explorers: diving suits, oxygen masks, flippers, underwater gear, coral accessories, seaweed hair decorations, pearl jewelry, nautical clothing. Add underwater environment: colorful coral reefs, tropical fish swimming around, sea anemones, underwater caves, sunlight filtering through water, bubbles floating up, shipwrecks, treasure chests, dolphins, sea turtles. Apply blue-green aquatic lighting with water ripple effects.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with post-apocalyptic survival aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistically weathered clothing with authentic wear patterns, genuine survival gear with realistic usage marks, maintain exact facial features with authentic environmental weathering effects on skin. For LANDSCAPES: Transform into photorealistic wasteland scenes with accurate decay physics, realistic structural damage, authentic atmospheric conditions with proper dust and debris physics. For OBJECTS: Add realistic rust and corrosion following actual oxidation processes, authentic makeshift repairs using real materials, maintain exact proportions with believable weathering. For FOOD: Present as realistic survival rations with authentic packaging wear, accurate preservation methods, maintain natural food textures under harsh conditions. For ANIMALS: Add realistic survival adaptations following evolutionary biology, authentic environmental weathering on fur/skin, maintain anatomically correct features. CRITICAL: Must look like an actual documentary photograph of real post-disaster conditions, with authentic weathering, realistic decay processes, and believable survival scenarios. Perfect disaster photography realism.",
   },
   {
-    id: "medieval",
-    name: "Medieval",
-    description: "Knights & castles",
+    id: "tropical",
+    name: "Tropical",
+    description: "Tropical paradise",
     prompt:
-      "Transform people into medieval characters: knights in armor with helmets and shields, princesses in flowing gowns with crowns, peasants in simple tunics, monks in robes, blacksmiths with leather aprons. Add medieval environment: stone castles, wooden bridges, torches on walls, banners with heraldic symbols, cobblestone paths, medieval weapons, horse stables, market stalls, gothic architecture. Apply warm candlelight with dramatic shadows.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with vibrant tropical paradise aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add authentic tropical clothing with realistic fabric textures, genuine flower leis with natural plant details, maintain exact facial features with realistic tropical lighting and natural skin tones. For LANDSCAPES: Transform into photorealistic tropical scenes with botanically accurate palm trees, authentic beach geology, crystal-clear water with realistic refraction and reflection physics. For OBJECTS: Add authentic tropical materials with realistic bamboo grain, natural island craftsmanship details, maintain exact proportions with believable tropical weathering. For FOOD: Present authentic tropical cuisine with realistic exotic fruit textures, natural coconut materials, maintain accurate food physics and moisture. For ANIMALS: Add tropical species with anatomically correct features, realistic plumage and fur textures, authentic tropical environment interactions. CRITICAL: Must look like an actual tropical vacation photograph taken with professional equipment, with authentic natural lighting, realistic tropical conditions, and perfect beach photography quality. No artificial or enhanced effects.",
   },
   {
-    id: "neon_tokyo",
-    name: "Neon Tokyo",
-    description: "Japanese nightlife",
+    id: "winter",
+    name: "Winter",
+    description: "Winter wonderland",
     prompt:
-      "Transform people with Tokyo street fashion: colorful hair, anime-inspired outfits, LED accessories, kawaii elements, street wear, platform shoes, face masks with designs, tech gadgets. Add neon Tokyo environment: Japanese street signs, vending machines, cherry blossoms, paper lanterns, anime billboards, crowded streets, bullet trains, traditional temples mixed with modern buildings, ramen shops, arcade games. Apply vibrant neon pink and blue lighting.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with serene winter wonderland aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add authentic winter clothing with realistic fabric textures and insulation details, natural cold-weather effects on skin like rosy cheeks, maintain exact facial features with realistic winter lighting conditions. For LANDSCAPES: Transform into photorealistic snowy scenes with accurate snow physics, realistic ice formation, authentic frost patterns following natural crystallization, maintain proper winter atmospheric conditions. For OBJECTS: Add realistic snow accumulation following natural physics, authentic frost effects with accurate ice crystal formation, maintain exact proportions with believable winter weathering. For FOOD: Present authentic winter comfort food with realistic steam effects, natural hot food physics, maintain accurate food textures in cold conditions. For ANIMALS: Add realistic winter fur thickness following natural adaptation, authentic snow interaction, maintain anatomically correct features with believable cold-weather behavior. CRITICAL: Must look like an actual winter landscape photograph taken in real snow conditions, with authentic winter lighting, realistic snow physics, and perfect cold-weather photography quality.",
   },
   {
-    id: "steampunk",
-    name: "Steampunk",
-    description: "Victorian tech",
+    id: "fairy_tale",
+    name: "Fairy Tale",
+    description: "Enchanting fairy tale",
     prompt:
-      "Transform people into steampunk characters: brass goggles, leather corsets, top hats with gears, mechanical arm pieces, pocket watches, steam-powered accessories, Victorian clothing with industrial elements, copper jewelry. Add steampunk environment: brass pipes, steam engines, clockwork mechanisms, airships, industrial machinery, copper and bronze metals, vintage laboratories, mechanical contraptions, steam clouds. Apply warm brass lighting with industrial atmosphere.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with enchanting fairy tale magic aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistic magical clothing elements with authentic fabric textures and believable fantasy construction, maintain exact facial features with realistic magical lighting effects that follow optical physics. For LANDSCAPES: Transform into photorealistic enchanted forests with botanically accurate magical plants, realistic fairy lights using authentic light sources, maintain natural forest physics with believable magical enhancements. For OBJECTS: Add realistic magical enhancements with believable sparkle effects using real light physics, maintain exact object proportions with authentic magical craftsmanship. For FOOD: Present magical feast items with realistic food textures enhanced by believable magical presentation, maintain natural food physics with enchanted styling. For ANIMALS: Add realistic fairy tale creature elements following natural biology, maintain anatomically correct features with believable magical adaptations. CRITICAL: Must look like an actual photograph of a real fairy tale movie set or fantasy theme park, with authentic magical effects created through practical means, realistic lighting, and perfect fantasy photography quality. No obvious digital effects.",
   },
   {
-    id: "spy",
-    name: "Spy",
-    description: "Secret agent",
+    id: "horror",
+    name: "Horror",
+    description: "Gothic horror",
     prompt:
-      "Transform people into sophisticated secret agents: men in tailored black suits, bow ties, cufflinks, sleek sunglasses, leather gloves, spy watches; women in elegant cocktail dresses, pearl earrings, red lipstick, stylish trench coats, high heels. Add spy environment: casino interiors, luxury hotels, city rooftops at night, vintage sports cars, briefcases, surveillance equipment, martini glasses, poker tables, neon city lights, shadowy alleyways, international landmarks. Apply dramatic film noir lighting with high contrast shadows and mysterious atmosphere.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with atmospheric gothic horror aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add authentic gothic styling with realistic fabric textures and period-accurate construction, maintain exact facial features with realistic dramatic lighting that creates natural shadows and atmospheric effects. For LANDSCAPES: Transform into photorealistic gothic scenes with architecturally accurate old buildings, authentic atmospheric fog using real weather conditions, maintain natural lighting physics with dramatic enhancement. For OBJECTS: Add realistic aged textures following natural weathering processes, authentic antique patina with believable aging, maintain exact proportions with genuine historical wear. For FOOD: Present with authentic gothic presentation using period-accurate serving methods, realistic candlelit ambiance with natural flame lighting. For ANIMALS: Add realistic atmospheric enhancement with natural dramatic lighting, maintain anatomically correct animal features with believable gothic environment adaptation. CRITICAL: Must look like an actual photograph of a real gothic location or horror movie set, with authentic atmospheric conditions, realistic lighting, and perfect dramatic photography quality. Atmospheric but not frightening.",
   },
   {
-    id: "gothic",
-    name: "Gothic",
-    description: "Dark romance",
+    id: "desert_mirage",
+    name: "Desert Mirage",
+    description: "Arabian desert",
     prompt:
-      "Transform people into gothic characters: men in black Victorian coats, ruffled shirts, dark eyeliner, silver jewelry, leather boots; women in corsets, flowing black dresses, lace gloves, dark makeup, chokers, dramatic eye shadow. Add gothic environment: ancient cathedrals, stone gargoyles, wrought iron gates, candlelit chambers, stained glass windows, fog-covered graveyards, medieval architecture, ravens, thorny roses, ornate mirrors, velvet curtains. Apply moody purple and blue lighting with dramatic shadows and mysterious ambiance.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with mystical Arabian desert aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add authentic flowing desert robes with realistic fabric physics and wind effects, genuine ornate jewelry with realistic metalwork and gem properties, maintain exact facial features with authentic desert lighting conditions. For LANDSCAPES: Transform into photorealistic vast desert scenes with geologically accurate sand dunes, realistic oasis vegetation, authentic mirage effects following optical physics. For OBJECTS: Add genuine Arabian craftsmanship with realistic metalwork and authentic patina, maintain exact proportions with believable desert weathering and sand effects. For FOOD: Present authentic Arabian cuisine with realistic spice textures, period-accurate serving methods, maintain natural food physics in desert conditions. For ANIMALS: Add realistic desert adaptations following evolutionary biology, maintain anatomically correct features with authentic Middle Eastern environment context. CRITICAL: Must look like an actual desert photograph taken in the Arabian Peninsula, with authentic desert lighting, realistic sand physics, and perfect desert photography quality.",
   },
   {
-    id: "90s",
-    name: "90s",
-    description: "Retro nostalgia",
+    id: "crystal_cave",
+    name: "Crystal Cave",
+    description: "Magical crystal cave",
     prompt:
-      "Transform people with authentic 90s fashion: men in baggy jeans, flannel shirts, backwards baseball caps, sneakers, chain wallets; women in crop tops, high-waisted jeans, chokers, platform shoes, butterfly clips, denim jackets. Add 90s environment: arcade games, neon mall aesthetics, boom boxes, cassette tapes, VHS stores, roller rinks, geometric patterns, bright colors, old computers, pagers, CD players, grunge concert posters. Apply vibrant neon lighting with retro color schemes and nostalgic atmosphere.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with magical crystal cave aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistic crystalline accessories with authentic mineral properties, genuine gem-like reflections following optical physics, maintain exact facial features with realistic prismatic lighting effects created by real crystal refraction. For LANDSCAPES: Transform into photorealistic crystal caverns with geologically accurate gem formations, authentic prismatic light effects using real crystal optics, maintain natural cave physics with believable crystal growth. For OBJECTS: Add realistic crystal growth following natural mineralogy, authentic gem-like surfaces with proper refractive properties, maintain exact proportions with believable crystalline integration. For FOOD: Present with genuine crystal serving ware, realistic prismatic effects on food surfaces, maintain natural food textures with crystalline enhancement. For ANIMALS: Add realistic crystalline effects on fur/scales following natural physics, maintain anatomically correct features with believable crystal cave adaptations. CRITICAL: Must look like an actual photograph taken inside a real crystal cave or geode, with authentic mineral formations, realistic light refraction, and perfect geological photography quality.",
   },
   {
-    id: "disco",
-    name: "Disco",
-    description: "70s dance fever",
+    id: "floating_islands",
+    name: "Floating Islands",
+    description: "Ethereal floating islands",
     prompt:
-      "Transform people into disco dancers: men in wide-collar shirts, bell-bottom pants, gold chains, afro hairstyles, platform shoes; women in sequined dresses, feathered hair, bold makeup, metallic fabrics, go-go boots, large hoop earrings. Add disco environment: mirror balls, colorful dance floors, neon lights, vinyl records, DJ booths, retro furniture, lava lamps, psychedelic patterns, disco balls reflecting light, dance platforms, vintage microphones. Apply dynamic multicolored lighting with sparkles, reflections, and groovy dance floor atmosphere.",
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with ethereal floating islands aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistic flowing clothing with authentic fabric physics in low gravity, maintain exact facial features with believable aerial lighting conditions and natural wind effects. For LANDSCAPES: Transform into photorealistic floating island scenes with geologically accurate suspended terrain, realistic cloud formations with authentic atmospheric physics, maintain natural lighting with believable aerial perspective. For OBJECTS: Add realistic levitation effects following believable physics, authentic cloud integration with natural vapor properties, maintain exact proportions with credible aerial suspension. For FOOD: Present with realistic weightless presentation following actual zero-gravity physics, maintain natural food textures in aerial conditions. For ANIMALS: Add believable wing adaptations following aerodynamic principles, maintain anatomically correct features with realistic flight physics and aerial behavior. CRITICAL: Must look like an actual photograph of a real floating landscape or aerial photography with practical effects, with authentic atmospheric conditions, realistic physics, and perfect aerial photography quality.",
+  },
+  {
+    id: "time_machine",
+    name: "Time Machine",
+    description: "Temporal fusion",
+    prompt:
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with temporal fusion aesthetics blending multiple eras. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistic mixed-era clothing with authentic fabric textures from different time periods, maintain exact facial features with believable temporal lighting effects that blend different era photography styles. For LANDSCAPES: Transform into photorealistic scenes blending different historical periods with architecturally accurate buildings from various eras, maintain natural lighting physics with believable temporal overlay. For OBJECTS: Add authentic era-blending design with realistic materials from different time periods, maintain exact proportions with believable temporal wear patterns showing multiple historical influences. For FOOD: Present with realistic mixed-era presentation combining authentic historical serving methods, maintain natural food textures with believable temporal fusion styling. For ANIMALS: Add realistic temporal adaptations showing believable evolutionary variations, maintain anatomically correct features with authentic multi-era environmental context. CRITICAL: Must look like an actual photograph where different time periods have been seamlessly blended using practical effects, with authentic historical materials, realistic temporal physics, and perfect multi-era photography quality.",
+  },
+  {
+    id: "samurai",
+    name: "Samurai",
+    description: "Samurai warrior",
+    prompt:
+      "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with samurai warrior aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistic samurai clothing with authentic fabric textures and wear patterns, maintain exact facial features with realistic samurai lighting and natural skin tones. For LANDSCAPES: Transform into photorealistic samurai scenes with authentic samurai buildings and environments, maintain natural samurai lighting physics and atmospheric perspective. For OBJECTS: Add realistic samurai materials with authentic samurai textures and wear patterns, maintain exact proportions with believable samurai weathering. For FOOD: Present authentic samurai cuisine with realistic samurai textures and wear patterns, maintain natural samurai food physics. For ANIMALS: Add realistic samurai animals with authentic samurai textures and wear patterns, maintain anatomically correct features with believable samurai environment interactions. CRITICAL: Must look like an actual samurai warrior photograph taken with professional equipment, with authentic samurai lighting, realistic samurai conditions, and perfect samurai photography quality.",
   },
 ];
 
