@@ -112,6 +112,235 @@ const filterConfigs = {
     prompt:
       "Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with car mechanic aesthetics. ULTRA-REALISTIC DETAILS: For PEOPLE: Add realistic car mechanic clothing with authentic fabric textures and wear patterns, maintain exact facial features with realistic car mechanic lighting and natural skin tones. For LANDSCAPES: Transform into photorealistic car mechanic scenes with authentic car mechanic buildings and environments, maintain natural car mechanic lighting physics and atmospheric perspective. For OBJECTS: Add realistic car mechanic materials with authentic car mechanic textures and wear patterns, maintain exact proportions with believable car mechanic weathering. For FOOD: Present authentic car mechanic cuisine with realistic car mechanic textures and wear patterns, maintain natural car mechanic food physics. For ANIMALS: Add realistic car mechanic animals with authentic car mechanic textures and wear patterns, maintain anatomically correct features with believable car mechanic environment interactions. CRITICAL: Must look like an actual car mechanic photograph taken with professional equipment, with authentic car mechanic lighting, realistic car mechanic conditions, and perfect car mechanic photography quality.",
   },
+  matsuri: {
+    prompt: `
+    Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Japanese Matsuri aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic festival clothing (yukata, happi coats, traditional masks, paper fans), maintain exact facial features with warm lantern lighting and natural Japanese summer skin tones.
+
+For LANDSCAPES: Transform into photorealistic festival settings (shrine gates, food stalls, fireworks, lantern-lined streets), maintain natural Matsuri lighting physics with glowing reds, yellows, and flickering firelight.
+
+For OBJECTS: Add authentic Matsuri items (paper lanterns, taiko drums, festival floats, masks, calligraphy banners) with realistic textures and festival wear.
+
+For FOOD: Present authentic festival cuisine (takoyaki, yakitori, taiyaki, cotton candy, shaved ice) with realistic textures, warm plating, and natural steam or smoke.
+
+For ANIMALS: Add realistic Japanese animals in a festival context (goldfish in bowls, festival horses, owls perched near shrines) with believable lighting and interactions.
+
+CRITICAL: Must look like an actual Japanese Matsuri photograph with authentic lantern light, festival atmosphere, and perfect photorealistic quality.
+    `,
+  },
+  viking: {
+    prompt: `
+      Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Viking Age aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic Viking clothing (woolen tunics, fur cloaks, leather belts, iron chainmail, horned-less helmets, braided hair, detailed jewelry of bronze and silver), maintain exact facial features with realistic Northern lighting (cold daylight, firelit interiors) and natural rugged skin tones shaped by harsh climates.
+
+For LANDSCAPES: Transform into photorealistic Viking environments (fjords, wooden longhouses, icy seas, snow-dusted forests, stone rune monuments), maintain natural Nordic lighting physics with low-angle sunlight, fog, and dramatic weather.
+
+For OBJECTS: Add authentic Viking artifacts (longswords, axes, round shields with painted patterns, drinking horns, carved wooden ships), maintain exact proportions with believable wear, rust, wood grain, and battle scars.
+
+For FOOD: Present authentic Viking cuisine (smoked fish, roasted meats, bread, mead in wooden cups, berries, cheese) with rustic textures, wooden tableware, and firelit presentation.
+
+For ANIMALS: Add realistic Viking Age animals (ravens, wolves, horses, longship-dragons, hunting dogs) with authentic textures, natural fur details, and believable interaction with the Viking environment.
+
+CRITICAL: Must look like an actual Viking Age photograph as if captured in the 9th century with professional equipment, featuring authentic Nordic lighting, natural weathered textures, and perfect historical photographic quality.
+    `,
+  },
+  roman: {
+    prompt: `
+      Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Ancient Roman aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic Roman clothing (togas with colored trims, tunics, leather armor, helmets, sandals, senator’s robes), maintain exact facial features with realistic Roman lighting (sunlight with strong shadows, torch-lit interiors) and natural Mediterranean skin tones.
+
+For LANDSCAPES: Transform into photorealistic Roman environments (Colosseum, aqueducts, Roman baths, bustling forums, cobblestone streets), maintain natural Roman lighting physics with atmospheric depth and urban realism.
+
+For OBJECTS: Add authentic Roman artifacts (gladius swords, shields, scrolls, wax tablets, mosaics, marble statues), maintain exact proportions with believable weathering, scratches, and patina.
+
+For FOOD: Present authentic Roman cuisine (platters of bread, cheese, roasted meats, garum-seasoned fish, fruits, wine in goblets) with hyper-real textures, warm candlelight, and rustic presentation.
+
+For ANIMALS: Add realistic Roman animals (horses pulling chariots, lions for arenas, eagles, dogs) with authentic textures and natural integration into Roman life.
+
+CRITICAL: Must look like an actual Ancient Roman photograph as if captured during the height of the empire with professional equipment, featuring authentic Roman lighting, textures of marble and bronze, and perfect historical photographic quality.
+    `,
+  },
+  greek: {
+    prompt: `
+      Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Ancient Greek aesthetics.
+        ULTRA-REALISTIC DETAILS:
+
+        For PEOPLE: Add authentic Greek clothing (white linen chitons, togas, laurel crowns, bronze armor, leather sandals), maintain exact facial features with realistic Mediterranean lighting and natural skin tones inspired by marble statues brought to life.
+
+        For LANDSCAPES: Transform into photorealistic Greek environments (marble temples, olive groves, amphitheaters, sunlit coastlines, Aegean seascapes), maintain authentic Mediterranean lighting physics with deep blue skies and atmospheric clarity.
+
+        For OBJECTS: Add authentic Greek artifacts (bronze shields, pottery with red/black-figure designs, lyres, marble columns), maintain exact proportions with believable aging, patina, and weathering.
+
+        For FOOD: Present authentic Greek cuisine (bread, olives, grapes, figs, wine amphorae, roasted lamb, honey cakes) with realistic textures, golden sunlight, and natural presentation.
+
+        For ANIMALS: Add realistic Greek animals (horses, goats, owls, dolphins) with authentic textures and believable interactions in Mediterranean settings.
+
+        CRITICAL: Must look like an actual Ancient Greek photograph as if taken in antiquity with professional equipment, featuring authentic Mediterranean lighting, marble-and-bronze details, and perfect historical photographic quality.
+    `,
+  },
+  wasen: {
+    prompt: `
+Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Wasen Oktoberfest aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic Oktoberfest clothing (traditional Bavarian dirndl dresses, lederhosen, rustic shirts, embroidered vests, leather belts, detailed buttons, and polished shoes), maintain exact facial features with realistic festive lighting (warm tent glow, lanterns, and neon carnival reflections) and natural skin tones.
+
+For LANDSCAPES: Transform into photorealistic Wasen festival grounds (massive beer tents, decorated wooden facades, ferris wheels, carnival rides, Oktoberfest banners), maintain natural festive lighting physics (string lights, neon glows, candlelight) and atmospheric depth filled with cheerful crowds.
+
+For OBJECTS: Add authentic Oktoberfest props (large beer steins with condensation, roasted pretzels with coarse salt, grilled sausages on rustic wooden plates, carnival prizes), maintain exact proportions with believable wear, shine, and texture.
+
+For FOOD: Present traditional Oktoberfest cuisine (giant pretzels, roasted chicken, Schweinshaxe pork knuckle, bratwurst with mustard, sauerkraut, and foamy Maß beer mugs) with hyper-real textures, golden browns, and perfect festive plating.
+
+For ANIMALS: Add realistic Oktoberfest-related animals (festive horses pulling decorated beer wagons, farm animals in folk parade scenes) with authentic textures, natural festive accessories, and believable interaction with the festival environment.
+
+CRITICAL: Must look like an actual Wasen Oktoberfest photograph taken with professional equipment, with authentic festive lighting, lively autumn atmosphere, and perfect photorealistic festival photography quality.
+    `,
+  },
+  matrix: {
+    prompt: `
+      Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Matrix aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic Matrix clothing (long coats, tactical gear, sunglasses, sleek black fabrics with subtle digital green reflections), maintain exact facial features with realistic Matrix lighting (neon glows, digital rain glimmers) and natural skin tones enhanced by cinematic grading.
+
+For LANDSCAPES: Transform into photorealistic Matrix cityscapes (futuristic skyscrapers, digital code overlays, simulated urban decay), maintain natural Matrix physics with dramatic shadows, green-tinted atmosphere, and authentic cinematic depth.
+
+For OBJECTS: Add Matrix-style digital materials (metal, glass, and holographic textures infused with green code), maintain exact proportions with believable simulated wear, distortion, or “glitching.”
+
+For FOOD: Present simulated Matrix cuisine with hyper-real textures, slightly uncanny patterns of digital code, maintain realistic Matrix “simulation” physics and plating.
+
+For ANIMALS: Add Matrix-inspired animals (anomalous cats, digital ravens, code-fragmented dogs) with authentic Matrix textures, subtle glitch patterns, anatomically correct features yet slightly uncanny “simulation” presence.
+
+CRITICAL: Must look like an actual Matrix photograph, as if taken within the simulation with professional equipment, featuring authentic Matrix lighting, ultra-real digital conditions, and perfect cinematic photography quality.
+    `,
+  },
+  burning_man: {
+    prompt: `
+    Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Burning Man festival aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic outfits (futuristic costumes, desert goggles, LED suits, tribal accessories, face paint), maintain exact facial features with desert lighting and natural skin tones tinted by dust.
+
+For LANDSCAPES: Transform into photorealistic Black Rock Desert environments (dust storms, sunrise over the playa, giant art installations, neon-lit night scenes), maintain natural desert lighting physics and atmospheric haze.
+
+For OBJECTS: Add authentic Burning Man props (bicycles decorated with LEDs, mutant vehicles, wooden structures, glowing art sculptures) with realistic textures and playa dust.
+
+For FOOD: Present realistic festival food (communal meals, desert hydration setups, eclectic plating) with authentic textures.
+
+For ANIMALS: Add symbolic or surreal Burning Man-inspired animals (giant wooden effigies, sculptural birds, desert insects) integrated with installations.
+
+CRITICAL: Must look like an actual Burning Man photograph, dusty desert light, glowing neon nights, perfect photorealistic festival quality.
+    `,
+  },
+  mad_max: {
+    prompt: `
+    Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Mad Max aesthetics.
+      ULTRA-REALISTIC DETAILS:
+
+      For PEOPLE: Add authentic post-apocalyptic outfits (leather armor, metal scraps, goggles, dust masks, torn fabrics), maintain exact facial features with desert lighting and weathered, scarred skin tones.
+
+      For LANDSCAPES: Transform into photorealistic wastelands (abandoned highways, rusting vehicles, scorched deserts, improvised fortresses), maintain natural desert lighting physics with storm clouds and dust.
+
+      For OBJECTS: Add authentic survival props (spiked cars, flamethrowers, scavenged metal, jerrycans, motorcycles) with realistic weathering, rust, and oil stains.
+
+      For FOOD: Present survival rations (cans, makeshift grills, dried meat, scavenged grains) with gritty realism.
+
+      For ANIMALS: Add realistic desert animals (crows, mutant dogs, camels, buzzards) integrated with the harsh environment.
+
+      CRITICAL: Must look like an actual Mad Max world photograph with gritty desert light, rust, survival textures, and perfect cinematic photorealism.
+    `,
+  },
+  pharaon: {
+    prompt: `
+    Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Pharaoh’s Egypt aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic Egyptian clothing (linen kilts, gold collars, elaborate headdresses, Pharaoh crowns, painted eye makeup), maintain exact facial features with desert lighting and natural sunlit skin tones.
+
+For LANDSCAPES: Transform into photorealistic Egyptian settings (pyramids, Sphinx, temple columns, Nile landscapes), maintain natural desert lighting physics with sharp shadows and golden light.
+
+For OBJECTS: Add authentic Egyptian artifacts (hieroglyph-covered stelae, golden sarcophagi, papyrus scrolls, obsidian statues) with realistic textures, gold shine, and patina.
+
+For FOOD: Present authentic Egyptian offerings (dates, figs, bread, honey, beer in jars, roasted fish) with realistic textures and natural desert presentation.
+
+For ANIMALS: Add realistic Egyptian animals (sacred cats, falcons, crocodiles, scarabs, camels) with authentic textures and believable interactions.
+
+CRITICAL: Must look like an actual Pharaonic Egypt photograph, golden desert light, authentic temple textures, and perfect historical photorealistic quality.
+    `,
+  },
+  renaissance: {
+    prompt: `
+      Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Renaissance Italy aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic Renaissance clothing (velvet robes, embroidered gowns, doublets, capes, ruffled collars, jewelry), maintain exact facial features with candlelight or soft Florence daylight.
+
+For LANDSCAPES: Transform into photorealistic Renaissance settings (Florentine piazzas, Venice canals, marble palaces, workshops of painters), maintain natural Italian lighting physics with warm golden tones.
+
+For OBJECTS: Add authentic Renaissance artifacts (oil paintings in progress, marble sculptures, ornate books, gilded chalices, musical instruments) with realistic patina and workshop details.
+
+For FOOD: Present authentic Renaissance cuisine (bread, wine, roasted meats, olives, cheeses, fruits) with rustic wooden presentation and candlelit detail.
+
+For ANIMALS: Add realistic Italian animals (horses, dogs, doves, pigeons in piazzas) with authentic interactions in Renaissance settings.
+
+CRITICAL: Must look like an actual Renaissance Italy photograph, warm candlelight, marble textures, and perfect historical photorealistic quality.
+    `,
+  },
+  napaleon: {
+    prompt: `
+    Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with Napoleonic French aesthetics.
+ULTRA-REALISTIC DETAILS:
+
+For PEOPLE: Add authentic Napoleonic clothing (military uniforms with epaulettes, bicorne hats, cavalry gear, elegant empire-era dresses), maintain exact facial features with battlefield or ballroom lighting and realistic skin tones.
+
+For LANDSCAPES: Transform into photorealistic French settings (battlefields with smoke, Parisian boulevards, Versailles interiors, campaign tents), maintain natural European lighting physics with cloudy skies or chandelier glow.
+
+For OBJECTS: Add authentic Napoleonic artifacts (sabers, cannons, muskets, maps, imperial standards, medals), maintain exact proportions with realistic wear, patina, and smoke detail.
+
+For FOOD: Present authentic French cuisine of the era (bread, roasted meats, wine, cheese, pastries) with rustic plating and warm presentation.
+
+For ANIMALS: Add realistic Napoleonic animals (war horses, hunting dogs, doves, crows on battlefields) with believable anatomy and integration.
+
+CRITICAL: Must look like an actual Napoleonic France photograph, with authentic military detail, European lighting, and perfect historical photorealistic quality.
+    `,
+  },
+  dat: {
+    prompt: `
+      Create a HYPER-REALISTIC, PHOTOGRAPHIC transformation with DAT corporate automotive aesthetics.
+        ULTRA-REALISTIC DETAILS:
+
+        Brand Colors:
+
+        Primary Deep Blue: #103366
+
+        Accent Yellow: #FFE602
+        Always use Deep Blue (#103366) as the dominant corporate base (backgrounds, suits, signage) and Bright Yellow (#FFE602) as the secondary accent (icons, highlights, overlays).
+
+        For PEOPLE: Add authentic corporate clothing (elegant suits, smart dresses, business shoes) with subtle accents in DAT brand colors. Maintain exact facial features with professional expo or office lighting and confident expressions.
+
+        For LANDSCAPES: Transform into photorealistic DAT settings (corporate expo booths, modern offices, premium car dealerships, high-tech electric charging stations). Integrate blue and yellow branding in signage, panels, banners, and digital displays.
+
+        For OBJECTS: Add DAT-related objects (luxury cars, electric vehicles, charging stations, digital dashboards, tablets with software interfaces). Maintain exact proportions, clean reflections, and integrate brand colors into small details (lines, UI highlights, lighting).
+
+        For FOOD/BEVERAGE (if present): Present sleek corporate catering or coffee setups with polished textures and subtle yellow/blue details in cups, napkins, or presentation trays.
+
+        For ANIMALS (rare/optional): If animals are included, they should be symbolic and corporate-stylized (e.g., metallic falcon sculptures, sleek silhouettes), always subtle and integrated into the business context.
+
+        CRITICAL: Must look like an actual DAT corporate photograph, as if captured at a premium automotive expo or dealership. The image must feature:
+
+        Authentic DAT brand colors (#103366 / #FFE602) in backgrounds, accents, or highlights.
+
+        Luxury cars and corporate professionals in suits.
+
+        Modern, clean lighting with high realism, sharp reflections, and perfect photographic quality.
+    `,
+  },
 };
 
 export async function POST(request: NextRequest) {
