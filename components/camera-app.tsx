@@ -42,7 +42,8 @@ export type FilterType =
   | "gothic"
   | "90s"
   | "disco"
-  | "dat";
+  | "dat"
+  | "wasen";
 
 export interface Filter {
   id: FilterType;
@@ -57,6 +58,11 @@ const filters: Filter[] = [
     name: "Original",
     description: "No filter",
     prompt: "",
+  },
+  {
+    id: "wasen",
+    name: "Wasen",
+    description: "Wasen",
   },
   {
     id: "matrix",
@@ -115,8 +121,8 @@ const filters: Filter[] = [
   },
   {
     id: "dat",
-    name: "DAT style",
-    description: "DAT style",
+    name: "DAT Agent",
+    description: "DAT Agent",
   },
 ];
 
