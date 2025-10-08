@@ -54,10 +54,129 @@ export interface Filter {
 
 const filters: Filter[] = [
   {
+    id: "acid",
+    description: "Acid",
+    name: "Acid",
+  },
+  {
+    id: "vintage",
+    description: "Vintage",
+    name: "Vintage",
+  },
+  {
+    id: "cyberpunk",
+    description: "Cyberpunk",
+    name: "Cyberpunk",
+  },
+  {
+    id: "underwater",
+    description: "Underwater",
+    name: "Underwater",
+  },
+  {
+    id: "space",
+    description: "Space",
+    name: "Space",
+  },
+  {
+    id: "medieval",
+    description: "Medieval",
+    name: "Medieval",
+  },
+  {
+    id: "apocalypse",
+    description: "Apocalypse",
+    name: "Apocalypse",
+  },
+  {
+    id: "steampunk",
+    description: "Steampunk",
+    name: "Steampunk",
+  },
+  {
+    id: "tropical",
+    description: "Tropical",
+    name: "Tropical",
+  },
+  {
+    id: "winter",
+    description: "Winter",
+    name: "Winter",
+  },
+  {
+    id: "neon_tokyo",
+    description: "Neon Tokyo",
+    name: "Neon Tokyo",
+  },
+  {
+    id: "wild_west",
+    description: "Wild West",
+    name: "Wild West",
+  },
+  {
+    id: "art_deco",
+    description: "Art Deco",
+    name: "Art Deco",
+  },
+  {
+    id: "fairy_tale",
+    description: "Fairy Tale",
+    name: "Fairy Tale",
+  },
+  {
+    id: "horror",
+    description: "Horror",
+    name: "Horror",
+  },
+  {
+    id: "desert_mirage",
+    description: "Desert Mirage",
+    name: "Desert Mirage",
+  },
+  {
+    id: "crystal_cave",
+    description: "Crystal Cave",
+    name: "Crystal Cave",
+  },
+  {
+    id: "floating_islands",
+    description: "Floating Islands",
+    name: "Floating Islands",
+  },
+  {
+    id: "time_machine",
+    description: "Time Machine",
+    name: "Time Machine",
+  },
+  {
+    id: "spy",
+    description: "Spy",
+    name: "Spy",
+  },
+  {
+    id: "gothic",
+    description: "Gothic",
+    name: "Gothic",
+  },
+  {
+    id: "90s",
+    description: "90s",
+    name: "90s",
+  },
+  {
+    id: "disco",
+    description: "Disco",
+    name: "Disco",
+  },
+  {
+    id: "samurai",
+    description: "Samurai",
+    name: "Samurai",
+  },
+  {
     id: "none",
     name: "Original",
     description: "No filter",
-    prompt: "",
   },
   {
     id: "wasen",
