@@ -245,12 +245,28 @@ const filters: Filter[] = [
   },
 ];
 
+export type ModelId =
+  | "nano-banana"
+  | "nano-banana-2"
+  | "flux-2"
+  | "gemini-3.1-flash-image-preview"
+  | "flux-2/lora";
+
+export const MODEL_OPTIONS: { id: ModelId; label: string }[] = [
+  { id: "nano-banana", label: "Nano Banana" },
+  { id: "nano-banana-2", label: "Nano Banana 2" },
+  { id: "flux-2", label: "Flux 2" },
+  { id: "gemini-3.1-flash-image-preview", label: "Gemini 3.1 Flash" },
+  { id: "flux-2/lora", label: "Flux 2 LoRA" },
+];
+
 export function CameraApp() {
   const [selectedFilterIndex, setSelectedFilterIndex] = useState(0);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [capturedWithFrontCamera, setCapturedWithFrontCamera] = useState(false);
+  const [model, setModel] = useState<ModelId>("nano-banana");
 
   const selectedFilter = filters[selectedFilterIndex];
 
@@ -292,6 +308,7 @@ export function CameraApp() {
           body: JSON.stringify({
             imageUrl: imageDataUrl,
             filter: selectedFilter.id,
+            model,
           }),
         });
 
@@ -382,7 +399,7 @@ export function CameraApp() {
         setIsProcessing(false);
       }
     },
-    [selectedFilter]
+    [selectedFilter, model]
   );
 
   const handleReset = () => {
@@ -447,6 +464,8 @@ export function CameraApp() {
           onFilterSelect={handleFilterSelect}
           filterIndex={selectedFilterIndex}
           filters={filters}
+          model={model}
+          onModelChange={setModel}
         />
       ) : (
         <ProcessedImage

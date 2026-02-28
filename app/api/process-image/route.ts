@@ -370,7 +370,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { imageUrl, filter } = await request.json();
+    const { imageUrl, filter, model: requestModel } = await request.json();
 
     if (!imageUrl || !filter) {
       return NextResponse.json(
@@ -378,6 +378,18 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const allowedModels = [
+      "nano-banana",
+      "nano-banana-2",
+      "flux-2",
+      "gemini-3.1-flash-image-preview",
+      "flux-2/lora",
+    ] as const;
+    const model =
+      requestModel && allowedModels.includes(requestModel)
+        ? requestModel
+        : "nano-banana";
 
     if (filter === "none") {
       return NextResponse.json(
@@ -400,10 +412,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid filter" }, { status: 400 });
     }
 
-    console.log("weDat Processing image with Nano Banana:", filter);
+    console.log("weDat Processing image with", model, ":", filter);
     console.log("weDat Using dramatic transformation prompt");
 
-    const result = await fal.subscribe("fal-ai/nano-banana/edit", {
+    const result = await fal.subscribe(`fal-ai/${model}/edit`, {
       input: {
         prompt: config.prompt,
         image_urls: [imageUrl],

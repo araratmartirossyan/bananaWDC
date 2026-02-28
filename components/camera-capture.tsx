@@ -4,7 +4,8 @@ import type React from "react";
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { LiquidGlass } from "./liquid-glass";
-import type { Filter } from "./camera-app";
+import type { Filter, ModelId } from "./camera-app";
+import { MODEL_OPTIONS } from "./camera-app";
 
 const CameraIcon = ({ className }: { className?: string }) => (
   <svg
@@ -61,6 +62,8 @@ interface CameraCaptureProps {
   onFilterSelect: (index: number) => void;
   filterIndex: number;
   filters: Filter[];
+  model: ModelId;
+  onModelChange: (model: ModelId) => void;
 }
 
 export function CameraCapture({
@@ -69,6 +72,8 @@ export function CameraCapture({
   onFilterSelect,
   filterIndex,
   filters,
+  model,
+  onModelChange,
 }: CameraCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -875,7 +880,32 @@ export function CameraCapture({
           </LiquidGlass>
         </div>
 
-        <div className="flex justify-center mt-4 md:mt-6">
+        <div className="flex flex-col items-center gap-3 mt-4 md:mt-6">
+          <div
+            className="px-4 py-3 overflow-x-auto overflow-y-hidden bg-black/20 backdrop-blur-sm scrollbar-none"
+            style={{
+              borderRadius: "24px",
+              width: "min(360px, calc(100vw - 48px))",
+            }}
+          >
+            <div className="flex items-center justify-center gap-2 min-w-max">
+              {MODEL_OPTIONS.map(({ id, label }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => onModelChange(id)}
+                  className={`font-mono text-sm font-medium flex-shrink-0 text-center transition-all duration-300 whitespace-nowrap px-4 py-2 rounded-full ${
+                    model === id
+                      ? "text-yellow-400 bg-white/10 backdrop-blur-sm border border-white/20"
+                      : "text-white/60 hover:text-white/80"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div
             className="px-6 md:px-8 py-3 relative overflow-hidden bg-black/20 backdrop-blur-sm"
             style={{
