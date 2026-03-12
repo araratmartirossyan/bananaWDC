@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { Filter, FilterType } from "./camera-app"
+import type { Filter } from "./camera-app"
 
 interface FilterSelectorProps {
   filters: Filter[]
-  selectedFilter: FilterType
-  onFilterChange: (filter: FilterType) => void
+  selectedFilter: string
+  onFilterChange: (filterId: string) => void
 }
 
 export function FilterSelector({ filters, selectedFilter, onFilterChange }: FilterSelectorProps) {
@@ -23,10 +23,7 @@ export function FilterSelector({ filters, selectedFilter, onFilterChange }: Filt
             selectedFilter === filter.id && "ring-2 ring-primary ring-offset-2 ring-offset-background",
           )}
         >
-          <div className="flex items-center gap-2 w-full">
-            {filter.icon}
-            <span className="font-medium text-sm">{filter.name}</span>
-          </div>
+          <span className="font-medium text-sm">{filter.name}</span>
         </Button>
       ))}
     </div>

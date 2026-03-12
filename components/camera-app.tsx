@@ -1,248 +1,17 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { CameraCapture } from "./camera-capture";
 import { ProcessedImage } from "./processed-image";
 import { addWatermark } from "../lib/watermark";
 
-export type FilterType =
-  | "none"
-  | "matrix"
-  | "acid"
-  | "matsuri"
-  | "greek"
-  | "roman"
-  | "viking"
-  | "napaleon"
-  | "renaissance"
-  | "pharaon"
-  | "burning_man"
-  | "mad_max"
-  | "gta"
-  | "samurai"
-  | "car_mechanic"
-  | "vintage"
-  | "cyberpunk"
-  | "underwater"
-  | "medieval"
-  | "apocalypse"
-  | "steampunk"
-  | "tropical"
-  | "space"
-  | "winter"
-  | "neon_tokyo"
-  | "wild_west"
-  | "art_deco"
-  | "fairy_tale"
-  | "horror"
-  | "desert_mirage"
-  | "crystal_cave"
-  | "floating_islands"
-  | "time_machine"
-  | "spy"
-  | "gothic"
-  | "90s"
-  | "disco"
-  | "dat"
-  | "wasen";
-
 export interface Filter {
-  id: FilterType;
+  id: string;
   name: string;
-  description: string;
-  prompt?: string;
+  description?: string;
 }
 
-const filters: Filter[] = [
-  {
-    id: "acid",
-    description: "Acid",
-    name: "Acid",
-  },
-  {
-    id: "vintage",
-    description: "Vintage",
-    name: "Vintage",
-  },
-  {
-    id: "cyberpunk",
-    description: "Cyberpunk",
-    name: "Cyberpunk",
-  },
-  {
-    id: "underwater",
-    description: "Underwater",
-    name: "Underwater",
-  },
-  {
-    id: "space",
-    description: "Space",
-    name: "Space",
-  },
-  {
-    id: "medieval",
-    description: "Medieval",
-    name: "Medieval",
-  },
-  {
-    id: "apocalypse",
-    description: "Apocalypse",
-    name: "Apocalypse",
-  },
-  {
-    id: "steampunk",
-    description: "Steampunk",
-    name: "Steampunk",
-  },
-  {
-    id: "tropical",
-    description: "Tropical",
-    name: "Tropical",
-  },
-  {
-    id: "winter",
-    description: "Winter",
-    name: "Winter",
-  },
-  {
-    id: "neon_tokyo",
-    description: "Neon Tokyo",
-    name: "Neon Tokyo",
-  },
-  {
-    id: "wild_west",
-    description: "Wild West",
-    name: "Wild West",
-  },
-  {
-    id: "art_deco",
-    description: "Art Deco",
-    name: "Art Deco",
-  },
-  {
-    id: "fairy_tale",
-    description: "Fairy Tale",
-    name: "Fairy Tale",
-  },
-  {
-    id: "horror",
-    description: "Horror",
-    name: "Horror",
-  },
-  {
-    id: "desert_mirage",
-    description: "Desert Mirage",
-    name: "Desert Mirage",
-  },
-  {
-    id: "crystal_cave",
-    description: "Crystal Cave",
-    name: "Crystal Cave",
-  },
-  {
-    id: "floating_islands",
-    description: "Floating Islands",
-    name: "Floating Islands",
-  },
-  {
-    id: "time_machine",
-    description: "Time Machine",
-    name: "Time Machine",
-  },
-  {
-    id: "spy",
-    description: "Spy",
-    name: "Spy",
-  },
-  {
-    id: "gothic",
-    description: "Gothic",
-    name: "Gothic",
-  },
-  {
-    id: "90s",
-    description: "90s",
-    name: "90s",
-  },
-  {
-    id: "disco",
-    description: "Disco",
-    name: "Disco",
-  },
-  {
-    id: "samurai",
-    description: "Samurai",
-    name: "Samurai",
-  },
-  {
-    id: "none",
-    name: "Original",
-    description: "No filter",
-  },
-  {
-    id: "wasen",
-    name: "Wasen",
-    description: "Wasen",
-  },
-  {
-    id: "matrix",
-    name: "Matrix",
-    description: "Matrix",
-  },
-  {
-    id: "matsuri",
-    name: "Matsuri",
-    description: "Matsuri",
-  },
-  {
-    id: "greek",
-    name: "Greek",
-    description: "Greek",
-  },
-  {
-    id: "roman",
-    name: "Roman",
-    description: "Roman",
-  },
-  {
-    id: "viking",
-    name: "Viking",
-    description: "Viking",
-  },
-  {
-    id: "car_mechanic",
-    name: "Car Mechanic",
-    description: "Car mechanic",
-  },
-  {
-    id: "napaleon",
-    name: "Napaleon",
-    description: "Napaleon",
-  },
-  {
-    id: "renaissance",
-    name: "Renaissance",
-    description: "Renaissance",
-  },
-  {
-    id: "pharaon",
-    name: "Pharaon",
-    description: "Pharaon",
-  },
-  {
-    id: "burning_man",
-    name: "Burning Man",
-    description: "Burning Man",
-  },
-  {
-    id: "mad_max",
-    name: "Mad Max",
-    description: "Mad Max",
-  },
-  {
-    id: "dat",
-    name: "DAT Agent",
-    description: "DAT Agent",
-  },
+const FALLBACK_FILTERS: Filter[] = [
+  { id: "none", name: "Original", description: "No filter" },
 ];
 
 export type ModelId =
@@ -261,6 +30,8 @@ export const MODEL_OPTIONS: { id: ModelId; label: string }[] = [
 ];
 
 export function CameraApp() {
+  const [filters, setFilters] = useState<Filter[]>(FALLBACK_FILTERS);
+  const [filtersLoading, setFiltersLoading] = useState(true);
   const [selectedFilterIndex, setSelectedFilterIndex] = useState(0);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -268,7 +39,34 @@ export function CameraApp() {
   const [capturedWithFrontCamera, setCapturedWithFrontCamera] = useState(false);
   const [model, setModel] = useState<ModelId>("nano-banana");
 
-  const selectedFilter = filters[selectedFilterIndex];
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/filters")
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled || !Array.isArray(data.filters)) return;
+        if (data.filters.length > 0) {
+          setFilters(data.filters);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFilters(FALLBACK_FILTERS);
+      })
+      .finally(() => {
+        if (!cancelled) setFiltersLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedFilterIndex >= filters.length && filters.length > 0) {
+      setSelectedFilterIndex(0);
+    }
+  }, [filters.length, selectedFilterIndex]);
+
+  const selectedFilter = filters[selectedFilterIndex] ?? filters[0];
 
   const handleCapture = useCallback(
     async (imageDataUrl: string, facingMode: "user" | "environment") => {

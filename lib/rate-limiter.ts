@@ -1,4 +1,4 @@
-// Redis-based rate limiter for API endpoints using Upstash (optional: skipped when env not set)
+// Redis-based rate limiter for API endpoints using Upstash
 import { Redis } from "@upstash/redis";
 
 interface RateLimitResult {
@@ -7,40 +7,25 @@ interface RateLimitResult {
   remaining?: number;
 }
 
-const MAX_REQUESTS = 25;
-const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-function isRedisConfigured(): boolean {
-  const url = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
-  return Boolean(url && token && url.startsWith("https://"));
-}
-
 class RedisRateLimiter {
-  private redis: Redis | null = null;
+  private redis: Redis;
   private readonly maxRequests: number;
   private readonly windowMs: number;
 
-  constructor(maxRequests = MAX_REQUESTS, windowMs = WINDOW_MS) {
+  constructor(maxRequests = 25, windowMs = 24 * 60 * 60 * 1000) {
+    // Updated to 4 requests per day instead of 10 per minute
+    this.redis = new Redis({
+      url: process.env.KV_REST_API_URL!,
+      token: process.env.KV_REST_API_TOKEN!,
+    });
     this.maxRequests = maxRequests;
     this.windowMs = windowMs;
-    if (isRedisConfigured()) {
-      this.redis = new Redis({
-        url: process.env.KV_REST_API_URL!,
-        token: process.env.KV_REST_API_TOKEN!,
-      });
-    }
   }
 
   async isAllowed(identifier: string): Promise<RateLimitResult> {
     const now = Date.now();
-    const resetTime = now + this.windowMs;
-
-    if (!this.redis) {
-      return { allowed: true, resetTime, remaining: this.maxRequests };
-    }
-
     const key = `rate_limit:${identifier}`;
+    const resetTime = now + this.windowMs;
 
     try {
       const pipeline = this.redis.pipeline();
@@ -56,18 +41,15 @@ class RedisRateLimiter {
           resetTime,
           remaining: this.maxRequests - count,
         };
+      } else {
+        return {
+          allowed: false,
+          resetTime,
+          remaining: 0,
+        };
       }
-      return {
-        allowed: false,
-        resetTime,
-        remaining: 0,
-      };
     } catch (error) {
-      console.warn(
-        "weDat Redis rate limiter unavailable, allowing request:",
-        error instanceof Error ? error.message : "Unknown error"
-      );
-      this.redis = null;
+      console.error("weDat Redis rate limiter error:", error);
       return {
         allowed: true,
         resetTime,
@@ -77,7 +59,8 @@ class RedisRateLimiter {
   }
 }
 
-export const rateLimiter = new RedisRateLimiter(MAX_REQUESTS, WINDOW_MS);
+// 4 requests per day per IP
+export const rateLimiter = new RedisRateLimiter(25, 24 * 60 * 60 * 1000); // Updated to 4 requests per 24 hours
 
 // Helper function to get client IP
 export function getClientIP(request: Request): string {
