@@ -5,9 +5,9 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "weDat Conference 2025",
-  description: "weData Conference 2025",
-  generator: "weDat",
+  title: "One Motion 2026",
+  description: "One Motion 2026",
+  generator: "One Motion",
 };
 
 export default function RootLayout({

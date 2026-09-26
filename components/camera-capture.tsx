@@ -362,7 +362,7 @@ export function CameraCapture({
           <div className="flex items-center">
             <img
               src="/banana-camera-logo.png"
-              alt="Banana Camera"
+              alt="One Motion 2026"
               className="w-12 h-12 md:w-24 md:h-24 object-contain"
             />
           </div>

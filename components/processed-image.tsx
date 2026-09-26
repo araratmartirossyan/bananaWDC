@@ -32,7 +32,7 @@ export function ProcessedImage({
       return;
     }
 
-    const filename = `wedat-cam-${filterName}-${Date.now()}.jpg`;
+    const filename = `one-motion-${filterName}-${Date.now()}.jpg`;
 
     // 1) Try Web Share with files (iOS share sheet lets user "Save Image" to Photos)
     try {
@@ -54,7 +54,7 @@ export function ProcessedImage({
           try {
             await navAny.share({
               files: [file],
-              title: "Hello From weDat",
+              title: "Hello From One Motion 2026",
               text: `https://smile.wedat.eu`,
             });
             return; // Shared successfully or user cancelled; no further action needed

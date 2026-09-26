@@ -44,7 +44,7 @@ export async function addWatermark(
       // Draw the original image without any transformations
       ctx.drawImage(img, 0, 0);
 
-      const watermarkText = "WDC Conference 2025";
+      const watermarkText = "One Motion 2026";
 
       const minFontSize = 80;
       const widthBasedSize = img.width / 2.5;

@@ -213,7 +213,7 @@ export function CameraApp() {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `filtered-photo-${selectedFilter.id}-${Date.now()}.jpg`;
+        link.download = `one-motion-${selectedFilter.id}-${Date.now()}.jpg`;
         link.style.display = "none";
         document.body.appendChild(link);
         link.click();
@@ -223,7 +223,7 @@ export function CameraApp() {
       } else {
         const link = document.createElement("a");
         link.href = processedImage;
-        link.download = `filtered-photo-${selectedFilter.id}-${Date.now()}.jpg`;
+        link.download = `one-motion-${selectedFilter.id}-${Date.now()}.jpg`;
         link.style.display = "none";
         link.setAttribute("target", "_self");
         document.body.appendChild(link);
