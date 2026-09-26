@@ -2,6 +2,11 @@ import { type NextRequest, NextResponse } from "next/server";
 import { fal } from "@fal-ai/client";
 import { rateLimiter, getClientIP } from "@/lib/rate-limiter";
 import { getFilterPrompt } from "@/lib/filters-store";
+import {
+  buildEditInput,
+  getModelEndpoint,
+  resolveModelId,
+} from "@/lib/models";
 
 // Configure fal client
 fal.config({
@@ -44,17 +49,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const allowedModels = [
-      "nano-banana",
-      "nano-banana-2",
-      "flux-2",
-      "gemini-3.1-flash-image-preview",
-      "flux-2/lora",
-    ] as const;
-    const model =
-      requestModel && allowedModels.includes(requestModel)
-        ? requestModel
-        : "nano-banana";
+    const model = resolveModelId(requestModel);
+    const endpoint = getModelEndpoint(model);
 
     if (filter === "none") {
       return NextResponse.json(
@@ -77,15 +73,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid filter" }, { status: 400 });
     }
 
-    console.log("weDat Processing image with", model, ":", filter);
+    console.log("weDat Processing image with", endpoint, ":", filter);
     console.log("weDat Using dramatic transformation prompt");
 
-    const result = await fal.subscribe(`fal-ai/${model}/edit`, {
-      input: {
-        prompt,
-        image_urls: [imageUrl],
-        num_images: 1,
-      },
+    const result = await fal.subscribe(endpoint, {
+      input: buildEditInput(model, prompt, imageUrl),
     });
 
     console.log("weDat Nano Banana transformation result:", result);

@@ -7,6 +7,7 @@ interface ProcessedImageProps {
   processedImage: string | null;
   isProcessing: boolean;
   filterName: string;
+  waitHint: string;
   onReset: () => void;
   onDownload: () => void;
   isFrontCamera: boolean;
@@ -17,6 +18,7 @@ export function ProcessedImage({
   processedImage,
   isProcessing,
   filterName,
+  waitHint,
   onReset,
   onDownload,
   isFrontCamera,
@@ -117,9 +119,9 @@ export function ProcessedImage({
         )}
 
         {isProcessing && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <div className="text-center space-y-6">
-              <div className="w-64 h-1 bg-white/20 rounded-full overflow-hidden">
+          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/40 px-6">
+            <div className="w-full max-w-sm flex flex-col items-center text-center gap-4">
+              <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-white rounded-full"
                   style={{
@@ -130,9 +132,10 @@ export function ProcessedImage({
                   }}
                 />
               </div>
-              <p className="text-white/80 font-medium">
+              <p className="text-white/90 font-medium">
                 Processing with {filterName}...
               </p>
+              <p className="text-white/60 text-sm">{waitHint}</p>
             </div>
           </div>
         )}

@@ -4,8 +4,9 @@ import type React from "react";
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { LiquidGlass } from "./liquid-glass";
-import type { Filter, ModelId } from "./camera-app";
-import { MODEL_OPTIONS } from "./camera-app";
+import { PickerIsland } from "./filter-island";
+import type { Filter } from "./camera-app";
+import { MODEL_OPTIONS, getModelWaitHint, type ModelId } from "@/lib/models";
 
 const CameraIcon = ({ className }: { className?: string }) => (
   <svg
@@ -18,7 +19,7 @@ const CameraIcon = ({ className }: { className?: string }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
-      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812-1.22A2 2 0 0118.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
     />
     <circle cx="12" cy="13" r="3" />
   </svg>
@@ -56,6 +57,38 @@ const UploadIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const FlashIcon = ({
+  className,
+  off = false,
+}: {
+  className?: string;
+  off?: boolean;
+}) => (
+  <svg
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"
+    />
+    {off && (
+      <line
+        x1="4"
+        y1="4"
+        x2="20"
+        y2="20"
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+    )}
+  </svg>
+);
+
 interface CameraCaptureProps {
   onCapture: (imageDataUrl: string, facingMode: "user" | "environment") => void;
   selectedFilter: Filter;
@@ -68,7 +101,6 @@ interface CameraCaptureProps {
 
 export function CameraCapture({
   onCapture,
-  selectedFilter,
   onFilterSelect,
   filterIndex,
   filters,
@@ -77,76 +109,15 @@ export function CameraCapture({
 }: CameraCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const [flashEnabled, setFlashEnabled] = useState(false);
+  const [isFlashing, setIsFlashing] = useState(false);
+  const isCapturingRef = useRef(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  const [showSwipeHint, setShowSwipeHint] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const hasEverTakenPhoto = localStorage.getItem(
-          "banana-camera-photo-taken"
-        );
-        const hasEverTakenPhotoAlt = localStorage.getItem(
-          "banana_camera_photo_taken"
-        ); // Alternative key
-        const sessionFlag = sessionStorage.getItem("banana-camera-photo-taken");
-
-        console.log(
-          "weDat Initializing showSwipeHint - localStorage value:",
-          hasEverTakenPhoto
-        );
-        console.log(
-          "weDat Initializing showSwipeHint - alternative key:",
-          hasEverTakenPhotoAlt
-        );
-        console.log(
-          "weDat Initializing showSwipeHint - sessionStorage value:",
-          sessionFlag
-        );
-        console.log(
-          "weDat Initializing showSwipeHint - all localStorage keys:",
-          Object.keys(localStorage)
-        );
-
-        // Check if any of the storage methods indicate a photo was taken
-        const photoWasTaken =
-          hasEverTakenPhoto === "true" ||
-          hasEverTakenPhotoAlt === "true" ||
-          sessionFlag === "true";
-        console.log("weDat Photo was taken before:", photoWasTaken);
-
-        return !photoWasTaken;
-      } catch (error) {
-        console.log("weDat Error reading localStorage:", error);
-        return true; // Default to showing hint if there's an error
-      }
-    }
-    return true;
-  });
-  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(
-    null
-  );
-  const lastScrollTime = useRef(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const transitionTimeoutRef = useRef<NodeJS.Timeout>();
-
-  const [momentum, setMomentum] = useState(0);
-  const [velocity, setVelocity] = useState(0);
-  const momentumRef = useRef(0);
-  const velocityRef = useRef(0);
-  const lastTouchTime = useRef(0);
-  const animationFrameRef = useRef<number>();
-  const touchHistory = useRef<Array<{ x: number; time: number }>>([]);
-
-  const [wheelRotation, setWheelRotation] = useState(0);
-  const wheelRotationRef = useRef(0);
-  const targetRotationRef = useRef(0);
-  const isWheelAnimatingRef = useRef(false);
-  const autoCenterTimeoutRef = useRef<NodeJS.Timeout>();
 
   const startCamera = useCallback(
     async (facing: "user" | "environment" = facingMode) => {
@@ -227,46 +198,56 @@ export function CameraCapture({
     []
   );
 
+  const markPhotoTaken = useCallback(() => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem("banana-camera-photo-taken", "true");
+      localStorage.setItem("banana_camera_photo_taken", "true");
+      sessionStorage.setItem("banana-camera-photo-taken", "true");
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
+
   const capturePhoto = useCallback(async () => {
-    if (!videoRef.current || !canvasRef.current) return;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-
-    if (!context) return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    if (facingMode === "user") {
-      context.scale(-1, 1);
-      context.translate(-canvas.width, 0);
+    if (!videoRef.current || !canvasRef.current || isCapturingRef.current) {
+      return;
     }
 
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    isCapturingRef.current = true;
 
-    const imageDataUrl = canvas.toDataURL("image/jpeg", 0.9);
-    const compressedImageUrl = await compressImage(imageDataUrl);
-
-    console.log(
-      "weDat Photo captured - hiding hint and saving to localStorage"
-    );
-    setShowSwipeHint(false);
-    if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("banana-camera-photo-taken", "true");
-        localStorage.setItem("banana_camera_photo_taken", "true"); // Alternative key
-        sessionStorage.setItem("banana-camera-photo-taken", "true");
-        console.log("weDat localStorage set - banana-camera-photo-taken: true");
-        console.log("weDat All storage locations updated");
-      } catch (error) {
-        console.log("weDat Error saving to localStorage:", error);
+    try {
+      if (flashEnabled) {
+        setIsFlashing(true);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
-    }
 
-    onCapture(compressedImageUrl, facingMode);
-  }, [onCapture, compressImage, facingMode]);
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas) return;
+
+      const context = canvas.getContext("2d");
+      if (!context) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      if (facingMode === "user") {
+        context.scale(-1, 1);
+        context.translate(-canvas.width, 0);
+      }
+
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const imageDataUrl = canvas.toDataURL("image/jpeg", 0.9);
+      const compressedImageUrl = await compressImage(imageDataUrl);
+      markPhotoTaken();
+      onCapture(compressedImageUrl, facingMode);
+    } finally {
+      setIsFlashing(false);
+      isCapturingRef.current = false;
+    }
+  }, [onCapture, compressImage, facingMode, flashEnabled, markPhotoTaken]);
 
   const switchCamera = useCallback(() => {
     const newFacing = facingMode === "user" ? "environment" : "user";
@@ -283,445 +264,18 @@ export function CameraCapture({
         const imageDataUrl = e.target?.result as string;
         if (imageDataUrl) {
           const compressedImageUrl = await compressImage(imageDataUrl);
-
-          console.log(
-            "weDat Image uploaded - hiding hint and saving to localStorage"
-          );
-          setShowSwipeHint(false);
-          if (typeof window !== "undefined") {
-            try {
-              localStorage.setItem("banana-camera-photo-taken", "true");
-              localStorage.setItem("banana_camera_photo_taken", "true"); // Alternative key
-              sessionStorage.setItem("banana-camera-photo-taken", "true");
-              console.log(
-                "weDat localStorage set - banana-camera-photo-taken: true"
-              );
-              console.log("weDat All storage locations updated");
-            } catch (error) {
-              console.log("weDat Error saving to localStorage:", error);
-            }
-          }
-
+          markPhotoTaken();
           onCapture(compressedImageUrl, "environment");
         }
       };
       reader.readAsDataURL(file);
     },
-    [onCapture, compressImage]
+    [onCapture, compressImage, markPhotoTaken]
   );
 
   const triggerImageUpload = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
-
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    setTouchStart({ x: touch.clientX, y: touch.clientY });
-
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-    if (autoCenterTimeoutRef.current) {
-      clearTimeout(autoCenterTimeoutRef.current);
-    }
-    if (transitionTimeoutRef.current) {
-      clearTimeout(transitionTimeoutRef.current);
-    }
-
-    // Reset all animation states to prevent erratic movement
-    wheelRotationRef.current = 0;
-    targetRotationRef.current = 0;
-    velocityRef.current = 0;
-    momentumRef.current = 0;
-    isWheelAnimatingRef.current = false;
-
-    setWheelRotation(0);
-    setMomentum(0);
-    setVelocity(0);
-    setIsTransitioning(false);
-
-    lastTouchTime.current = Date.now();
-    touchHistory.current = [{ x: touch.clientX, time: Date.now() }];
-  }, []);
-
-  const autoCenter = useCallback(() => {
-    console.log(
-      "weDat Auto-centering from rotation:",
-      wheelRotationRef.current
-    );
-
-    const startRotation = wheelRotationRef.current;
-    const startTime = Date.now();
-    const duration = 200;
-
-    const animateToCenter = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easeOut = 1 - Math.pow(1 - progress, 2); // Smooth easing
-
-      wheelRotationRef.current = startRotation * (1 - easeOut);
-      setWheelRotation(wheelRotationRef.current);
-      setMomentum(wheelRotationRef.current);
-
-      if (progress < 1) {
-        requestAnimationFrame(animateToCenter);
-      } else {
-        wheelRotationRef.current = 0;
-        targetRotationRef.current = 0;
-        setWheelRotation(0);
-        setMomentum(0);
-        console.log("weDat Auto-center complete");
-      }
-    };
-
-    requestAnimationFrame(animateToCenter);
-  }, []);
-
-  const animateMomentum = useCallback(() => {
-    const friction = 0.96; // Increased from 0.92 for more control
-    const snapThreshold = 0.1;
-
-    velocityRef.current *= friction;
-    wheelRotationRef.current += velocityRef.current * 0.4; // Reduced from 0.7 for slower movement
-
-    const rotationThreshold = 20; // Reduced from 30 for quicker response
-    if (Math.abs(wheelRotationRef.current) > rotationThreshold) {
-      const direction = wheelRotationRef.current > 0 ? 1 : -1;
-      let newIndex;
-
-      if (direction > 0) {
-        newIndex = filterIndex < filters.length - 1 ? filterIndex + 1 : 0;
-      } else {
-        newIndex = filterIndex > 0 ? filterIndex - 1 : filters.length - 1;
-      }
-
-      console.log(
-        "weDat Momentum filter change from",
-        filterIndex,
-        "to",
-        newIndex,
-        "rotation:",
-        wheelRotationRef.current
-      );
-      onFilterSelect(newIndex);
-      setShowSwipeHint(false);
-
-      wheelRotationRef.current = 0;
-      targetRotationRef.current = 0;
-      velocityRef.current = 0;
-      setWheelRotation(0);
-      setMomentum(0);
-      setVelocity(0);
-
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (autoCenterTimeoutRef.current) {
-        clearTimeout(autoCenterTimeoutRef.current);
-      }
-
-      return;
-    }
-
-    if (
-      Math.abs(velocityRef.current) > 0.05 ||
-      Math.abs(wheelRotationRef.current) > 0.3
-    ) {
-      isWheelAnimatingRef.current = true;
-      animationFrameRef.current = requestAnimationFrame(animateMomentum);
-    } else {
-      isWheelAnimatingRef.current = false;
-      console.log("weDat Momentum stopped - starting auto-center");
-      if (autoCenterTimeoutRef.current) {
-        clearTimeout(autoCenterTimeoutRef.current);
-      }
-      autoCenterTimeoutRef.current = setTimeout(autoCenter, 50);
-    }
-
-    setWheelRotation(wheelRotationRef.current);
-    setMomentum(wheelRotationRef.current);
-    setVelocity(velocityRef.current);
-  }, [filterIndex, filters.length, onFilterSelect, autoCenter]);
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!touchStart) return;
-
-      const touch = e.touches[0];
-      const currentTime = Date.now();
-      const deltaX = touch.clientX - touchStart.x;
-
-      wheelRotationRef.current = deltaX * 0.3; // Reduced from 0.5 for slower movement
-      setWheelRotation(wheelRotationRef.current);
-      setMomentum(wheelRotationRef.current);
-
-      touchHistory.current.push({ x: touch.clientX, time: currentTime });
-      touchHistory.current = touchHistory.current.filter(
-        (t) => currentTime - t.time < 100
-      );
-
-      const rotationThreshold = 18; // Reduced from 25 for quicker response
-      if (Math.abs(wheelRotationRef.current) > rotationThreshold) {
-        const direction = wheelRotationRef.current > 0 ? -1 : 1; // Inverted for natural feel
-        let newIndex;
-
-        if (direction > 0) {
-          newIndex = filterIndex < filters.length - 1 ? filterIndex + 1 : 0;
-        } else {
-          newIndex = filterIndex > 0 ? filterIndex - 1 : filters.length - 1;
-        }
-
-        console.log(
-          "weDat Touch drag filter change from",
-          filterIndex,
-          "to",
-          newIndex,
-          "rotation:",
-          wheelRotationRef.current
-        );
-        onFilterSelect(newIndex);
-        setShowSwipeHint(false);
-
-        wheelRotationRef.current = 0;
-        targetRotationRef.current = 0;
-        setWheelRotation(0);
-        setMomentum(0);
-        setTouchStart({ x: touch.clientX, y: touch.clientY }); // Reset touch start for continuous dragging
-      }
-    },
-    [touchStart, filterIndex, filters.length, onFilterSelect]
-  );
-
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (!touchStart) return;
-
-      const touch = e.changedTouches[0];
-      const deltaX = touch.clientX - touchStart.x;
-      const deltaY = touch.clientY - touchStart.y;
-      const currentTime = Date.now();
-
-      const recentTouches = touchHistory.current.filter(
-        (t) => currentTime - t.time < 100
-      );
-      if (recentTouches.length >= 2) {
-        const firstTouch = recentTouches[0];
-        const lastTouch = recentTouches[recentTouches.length - 1];
-        const timeDiff = lastTouch.time - firstTouch.time;
-
-        if (timeDiff > 0) {
-          velocityRef.current = ((lastTouch.x - firstTouch.x) / timeDiff) * 5; // Reduced from 8
-        }
-      }
-
-      const swipeThreshold = 20; // Reduced from 30 for quicker response
-      if (
-        Math.abs(deltaX) > Math.abs(deltaY) &&
-        Math.abs(deltaX) > swipeThreshold
-      ) {
-        let newIndex;
-
-        if (deltaX > 0) {
-          newIndex = filterIndex > 0 ? filterIndex - 1 : filters.length - 1;
-        } else {
-          newIndex = filterIndex < filters.length - 1 ? filterIndex + 1 : 0;
-        }
-
-        console.log(
-          "weDat Touch swipe filter change from",
-          filterIndex,
-          "to",
-          newIndex,
-          "deltaX:",
-          deltaX
-        );
-        onFilterSelect(newIndex);
-        setShowSwipeHint(false);
-
-        wheelRotationRef.current = 0;
-        targetRotationRef.current = 0;
-        velocityRef.current = 0;
-        setWheelRotation(0);
-        setMomentum(0);
-        setVelocity(0);
-      } else if (Math.abs(deltaX) > 5 && Math.abs(velocityRef.current) > 0.3) {
-        animateMomentum();
-      } else {
-        console.log("weDat Touch end - starting auto-center");
-        if (autoCenterTimeoutRef.current) {
-          clearTimeout(autoCenterTimeoutRef.current);
-        }
-        autoCenterTimeoutRef.current = setTimeout(autoCenter, 100);
-      }
-
-      setTouchStart(null);
-      touchHistory.current = [];
-    },
-    [
-      touchStart,
-      filterIndex,
-      filters.length,
-      onFilterSelect,
-      animateMomentum,
-      autoCenter,
-    ]
-  );
-
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (isTransitioning) return;
-
-      const now = Date.now();
-      if (now - lastScrollTime.current < 16) {
-        return;
-      }
-      lastScrollTime.current = now;
-
-      const deltaY = Math.abs(e.deltaY);
-      const deltaX = Math.abs(e.deltaX);
-
-      if (deltaY < 1 && deltaX < 1) return;
-
-      const scrollIntensity = Math.min(Math.max(deltaY + deltaX, 5), 50);
-      const direction = (deltaX > deltaY ? e.deltaX : e.deltaY) > 0 ? 1 : -1;
-
-      wheelRotationRef.current += direction * scrollIntensity * 0.15; // Reduced from 0.25
-      velocityRef.current = direction * scrollIntensity * 0.05; // Reduced from 0.08
-
-      console.log(
-        "weDat Wheel event, rotation:",
-        wheelRotationRef.current,
-        "direction:",
-        direction
-      );
-
-      if (Math.abs(wheelRotationRef.current) > 25) {
-        // Reduced from 35
-        let newIndex;
-
-        if (wheelRotationRef.current > 0) {
-          newIndex = filterIndex < filters.length - 1 ? filterIndex + 1 : 0;
-        } else {
-          newIndex = filterIndex > 0 ? filterIndex - 1 : filters.length - 1;
-        }
-
-        console.log(
-          "weDat Wheel filter change from",
-          filterIndex,
-          "to",
-          newIndex
-        );
-        onFilterSelect(newIndex);
-        setShowSwipeHint(false);
-
-        wheelRotationRef.current = 0;
-        targetRotationRef.current = 0;
-        velocityRef.current = 0;
-        setWheelRotation(0);
-        setMomentum(0);
-        setVelocity(0);
-
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
-        }
-        if (autoCenterTimeoutRef.current) {
-          clearTimeout(autoCenterTimeoutRef.current);
-        }
-
-        return;
-      }
-
-      if (autoCenterTimeoutRef.current) {
-        clearTimeout(autoCenterTimeoutRef.current);
-      }
-
-      animateMomentum();
-    },
-    [
-      filterIndex,
-      filters.length,
-      onFilterSelect,
-      isTransitioning,
-      animateMomentum,
-    ]
-  );
-
-  const handleFilterChange = useCallback(
-    (newIndex: number) => {
-      if (newIndex !== filterIndex && !isTransitioning) {
-        setIsTransitioning(true);
-        onFilterSelect(newIndex);
-        setShowSwipeHint(false);
-
-        wheelRotationRef.current = 0;
-        targetRotationRef.current = 0;
-        velocityRef.current = 0;
-        setWheelRotation(0);
-        setMomentum(0);
-        setVelocity(0);
-
-        if (transitionTimeoutRef.current) {
-          clearTimeout(transitionTimeoutRef.current);
-        }
-        transitionTimeoutRef.current = setTimeout(() => {
-          setIsTransitioning(false);
-        }, 500);
-      }
-    },
-    [filterIndex, onFilterSelect, isTransitioning]
-  );
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (isTransitioning) return;
-
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        const newIndex = filterIndex > 0 ? filterIndex - 1 : filters.length - 1;
-        setIsTransitioning(true);
-        onFilterSelect(newIndex);
-        setShowSwipeHint(false);
-
-        wheelRotationRef.current = 0;
-        targetRotationRef.current = 0;
-        velocityRef.current = 0;
-        setWheelRotation(0);
-        setMomentum(0);
-        setVelocity(0);
-
-        if (transitionTimeoutRef.current) {
-          clearTimeout(transitionTimeoutRef.current);
-        }
-        transitionTimeoutRef.current = setTimeout(() => {
-          setIsTransitioning(false);
-        }, 600);
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        const newIndex = filterIndex < filters.length - 1 ? filterIndex + 1 : 0;
-        setIsTransitioning(true);
-        onFilterSelect(newIndex);
-        setShowSwipeHint(false);
-
-        wheelRotationRef.current = 0;
-        targetRotationRef.current = 0;
-        velocityRef.current = 0;
-        setWheelRotation(0);
-        setMomentum(0);
-        setVelocity(0);
-
-        if (transitionTimeoutRef.current) {
-          clearTimeout(transitionTimeoutRef.current);
-        }
-        transitionTimeoutRef.current = setTimeout(() => {
-          setIsTransitioning(false);
-        }, 600);
-      }
-    },
-    [filterIndex, filters.length, onFilterSelect, isTransitioning]
-  );
 
   useEffect(() => {
     const checkIsDesktop = () => {
@@ -741,25 +295,9 @@ export function CameraCapture({
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
       }
-      if (transitionTimeoutRef.current) {
-        clearTimeout(transitionTimeoutRef.current);
-      }
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-      if (autoCenterTimeoutRef.current) {
-        clearTimeout(autoCenterTimeoutRef.current);
-      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- start camera once on mount
   }, []);
-
-  useEffect(() => {
-    console.log("weDat Camera state - isLoading:", isLoading, "error:", error);
-  }, [isLoading, error]);
-
-  useEffect(() => {
-    console.log("weDat showSwipeHint state changed to:", showSwipeHint);
-  }, [showSwipeHint]);
 
   if (error) {
     return (
@@ -785,15 +323,8 @@ export function CameraCapture({
 
   return (
     <div
-      ref={containerRef}
-      className="h-full w-full relative bg-black touch-none select-none border-0"
+      className="h-full w-full relative bg-black select-none border-0"
       style={{ userSelect: "none", WebkitUserSelect: "none" }}
-      tabIndex={0}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onWheel={handleWheel}
-      onKeyDown={handleKeyDown}
     >
       <input
         ref={fileInputRef}
@@ -826,7 +357,7 @@ export function CameraCapture({
 
       <canvas ref={canvasRef} className="hidden" />
 
-      <div className="absolute top-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-b from-black/50 to-transparent pointer-events-auto z-20">
+      <div className="absolute top-0 left-0 right-0 p-4 md:p-6 bg-linear-to-b from-black/50 to-transparent pointer-events-auto z-20">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <img
@@ -837,6 +368,18 @@ export function CameraCapture({
           </div>
 
           <div className="flex items-center space-x-2 ml-auto">
+            <LiquidGlass
+              variant="button"
+              intensity="medium"
+              onClick={() => setFlashEnabled((on) => !on)}
+              className={`rounded-full w-10 h-10 p-0 flex items-center justify-center ${
+                flashEnabled ? "text-yellow-400" : "text-white"
+              }`}
+              style={{ borderRadius: "50%" }}
+            >
+              <FlashIcon className="w-4 h-4" off={!flashEnabled} />
+            </LiquidGlass>
+
             <LiquidGlass
               variant="button"
               intensity="medium"
@@ -860,7 +403,7 @@ export function CameraCapture({
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 pb-12 md:pb-8 bg-gradient-to-t from-black/50 to-transparent pointer-events-auto z-20">
+      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 pb-12 md:pb-8 bg-linear-to-t from-black/50 to-transparent pointer-events-auto z-20">
         <div className="flex justify-center items-center">
           <LiquidGlass
             variant="panel"
@@ -880,137 +423,38 @@ export function CameraCapture({
           </LiquidGlass>
         </div>
 
-        <div className="flex flex-col items-center gap-3 mt-4 md:mt-6">
-          <div
-            className="px-4 py-3 overflow-x-auto overflow-y-hidden bg-black/20 backdrop-blur-sm scrollbar-none"
-            style={{
-              borderRadius: "24px",
-              width: "min(360px, calc(100vw - 48px))",
+        <div className="w-full max-w-lg mx-auto flex flex-col items-center gap-3 mt-4 md:mt-6">
+          <PickerIsland
+            title="Model"
+            items={MODEL_OPTIONS.map(({ id, label }) => ({
+              id,
+              name: label,
+            }))}
+            selectedId={model}
+            onSelect={(id) => onModelChange(id as ModelId)}
+          />
+
+          <p className="w-full text-white/55 font-mono text-xs text-center px-2">
+            {getModelWaitHint(model)}
+          </p>
+
+          <PickerIsland
+            title="Filters"
+            items={filters.map((filter) => ({
+              id: filter.id,
+              name: filter.name,
+            }))}
+            selectedId={filters[filterIndex]?.id ?? filters[0]?.id ?? "none"}
+            onSelect={(id) => {
+              const index = filters.findIndex((filter) => filter.id === id);
+              if (index >= 0) onFilterSelect(index);
             }}
-          >
-            <div className="flex items-center justify-center gap-2 min-w-max">
-              {MODEL_OPTIONS.map(({ id, label }) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => onModelChange(id)}
-                  className={`font-mono text-sm font-medium flex-shrink-0 text-center transition-all duration-300 whitespace-nowrap px-4 py-2 rounded-full ${
-                    model === id
-                      ? "text-yellow-400 bg-white/10 backdrop-blur-sm border border-white/20"
-                      : "text-white/60 hover:text-white/80"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div
-            className="px-6 md:px-8 py-3 relative overflow-hidden bg-black/20 backdrop-blur-sm"
-            style={{
-              borderRadius: "24px",
-              width: "min(280px, calc(100vw - 48px))",
-            }}
-          >
-            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-black/80 via-black/40 to-transparent z-10 pointer-events-none" />
-
-            <div
-              className="flex items-center justify-center relative"
-              style={{ height: "28px" }}
-            >
-              <div
-                className="flex items-center"
-                style={{
-                  transform: `translateX(${
-                    wheelRotation === 0
-                      ? 0
-                      : wheelRotation * (window.innerWidth < 768 ? 0.25 : 0.35)
-                  }px)`,
-                  transition: isTransitioning
-                    ? "transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
-                    : wheelRotation === 0
-                    ? "transform 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
-                    : "none",
-                  width: "100%",
-                  justifyContent: "center",
-                  gap: "8px",
-                }}
-              >
-                {(() => {
-                  const prevIndex =
-                    filterIndex > 0 ? filterIndex - 1 : filters.length - 1;
-                  const nextIndex =
-                    filterIndex < filters.length - 1 ? filterIndex + 1 : 0;
-
-                  const visibleFilters = [
-                    {
-                      filter: filters[prevIndex],
-                      index: prevIndex,
-                      position: "prev",
-                    },
-                    {
-                      filter: filters[filterIndex],
-                      index: filterIndex,
-                      position: "current",
-                    },
-                    {
-                      filter: filters[nextIndex],
-                      index: nextIndex,
-                      position: "next",
-                    },
-                  ];
-
-                  return visibleFilters.map(({ filter, index, position }) => {
-                    const isCurrent = position === "current";
-
-                    return (
-                      <button
-                        key={`${filter.id}-${position}`}
-                        onClick={() => handleFilterChange(index)}
-                        className={`font-mono text-sm font-medium flex-shrink-0 text-center transition-all duration-300 whitespace-nowrap relative px-4 py-2 rounded-full ${
-                          isCurrent
-                            ? "text-yellow-400 bg-white/10 backdrop-blur-sm border border-white/20"
-                            : "text-white/60 hover:text-white/80"
-                        }`}
-                        style={{
-                          transition: isTransitioning
-                            ? "all 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94)"
-                            : "all 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)",
-                        }}
-                      >
-                        <span className="relative z-10">{filter.name}</span>
-                      </button>
-                    );
-                  });
-                })()}
-              </div>
-            </div>
-          </div>
+          />
         </div>
       </div>
 
-      {showSwipeHint && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
-          <LiquidGlass
-            variant="panel"
-            intensity="medium"
-            rippleEffect={false}
-            flowOnHover={false}
-            stretchOnDrag={false}
-            className="px-4 py-2 animate-pulse"
-            style={{ borderRadius: "16px" }}
-          >
-            <div className="flex items-center space-x-2 text-white/80 font-mono text-sm">
-              <span>←</span>
-              <span className="whitespace-nowrap">
-                {isDesktop ? "scroll & capture" : "swipe & capture"}
-              </span>
-              <span>→</span>
-            </div>
-          </LiquidGlass>
-        </div>
+      {isFlashing && (
+        <div className="fixed inset-0 z-100 bg-white" aria-hidden="true" />
       )}
     </div>
   );

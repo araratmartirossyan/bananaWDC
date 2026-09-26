@@ -3,6 +3,11 @@ import { useState, useCallback, useEffect } from "react";
 import { CameraCapture } from "./camera-capture";
 import { ProcessedImage } from "./processed-image";
 import { addWatermark } from "../lib/watermark";
+import {
+  DEFAULT_MODEL_ID,
+  getModelWaitHint,
+  type ModelId,
+} from "@/lib/models";
 
 export interface Filter {
   id: string;
@@ -14,21 +19,6 @@ const FALLBACK_FILTERS: Filter[] = [
   { id: "none", name: "Original", description: "No filter" },
 ];
 
-export type ModelId =
-  | "nano-banana"
-  | "nano-banana-2"
-  | "flux-2"
-  | "gemini-3.1-flash-image-preview"
-  | "flux-2/lora";
-
-export const MODEL_OPTIONS: { id: ModelId; label: string }[] = [
-  { id: "nano-banana", label: "Nano Banana" },
-  { id: "nano-banana-2", label: "Nano Banana 2" },
-  { id: "flux-2", label: "Flux 2" },
-  { id: "gemini-3.1-flash-image-preview", label: "Gemini 3.1 Flash" },
-  { id: "flux-2/lora", label: "Flux 2 LoRA" },
-];
-
 export function CameraApp() {
   const [filters, setFilters] = useState<Filter[]>(FALLBACK_FILTERS);
   const [filtersLoading, setFiltersLoading] = useState(true);
@@ -37,7 +27,7 @@ export function CameraApp() {
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [capturedWithFrontCamera, setCapturedWithFrontCamera] = useState(false);
-  const [model, setModel] = useState<ModelId>("nano-banana");
+  const [model, setModel] = useState<ModelId>(DEFAULT_MODEL_ID);
 
   useEffect(() => {
     let cancelled = false;
@@ -271,6 +261,7 @@ export function CameraApp() {
           processedImage={processedImage}
           isProcessing={isProcessing}
           filterName={selectedFilter.name}
+          waitHint={getModelWaitHint(model)}
           onReset={handleReset}
           onDownload={handleDownload}
           isFrontCamera={capturedWithFrontCamera}
