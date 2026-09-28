@@ -28,6 +28,8 @@ export function CameraApp() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [capturedWithFrontCamera, setCapturedWithFrontCamera] = useState(false);
   const [model, setModel] = useState<ModelId>(DEFAULT_MODEL_ID);
+  const [appearEnabled, setAppearEnabled] = useState(false);
+  const [appearConfigured, setAppearConfigured] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,6 +53,21 @@ export function CameraApp() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    fetch("/api/appear")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled) setAppearConfigured(Boolean(data.configured));
+      })
+      .catch(() => {
+        if (!cancelled) setAppearConfigured(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     if (selectedFilterIndex >= filters.length && filters.length > 0) {
       setSelectedFilterIndex(0);
     }
@@ -64,7 +81,7 @@ export function CameraApp() {
       setProcessedImage(null);
       setCapturedWithFrontCamera(facingMode === "user");
 
-      if (selectedFilter.id === "none") {
+      if (selectedFilter.id === "none" && !appearEnabled) {
         try {
           const watermarkedImage = await addWatermark(
             imageDataUrl,
@@ -97,6 +114,7 @@ export function CameraApp() {
             imageUrl: imageDataUrl,
             filter: selectedFilter.id,
             model,
+            includeAppear: appearEnabled,
           }),
         });
 
@@ -187,7 +205,7 @@ export function CameraApp() {
         setIsProcessing(false);
       }
     },
-    [selectedFilter, model]
+    [selectedFilter, model, appearEnabled]
   );
 
   const handleReset = () => {
@@ -254,6 +272,9 @@ export function CameraApp() {
           filters={filters}
           model={model}
           onModelChange={setModel}
+          appearEnabled={appearEnabled}
+          appearConfigured={appearConfigured}
+          onAppearChange={setAppearEnabled}
         />
       ) : (
         <ProcessedImage

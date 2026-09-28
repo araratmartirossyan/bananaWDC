@@ -163,6 +163,8 @@ export default function AdminDashboardPage() {
           <p className="text-destructive">{error}</p>
         )}
 
+        <AppearPhotoCard />
+
         <div className="rounded-md border border-border overflow-hidden">
           <table className="w-full text-sm">
             <thead>
@@ -367,6 +369,155 @@ function FilterEditorModal({
             </Button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+function compressAppearPhoto(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read photo"));
+    reader.onload = () => {
+      const image = new Image();
+      image.onerror = () => reject(new Error("Could not load photo"));
+      image.onload = () => {
+        const maxSize = 768;
+        let { width, height } = image;
+        if (width > height && width > maxSize) {
+          height = (height * maxSize) / width;
+          width = maxSize;
+        } else if (height > maxSize) {
+          width = (width * maxSize) / height;
+          height = maxSize;
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+        const context = canvas.getContext("2d");
+        if (!context) {
+          reject(new Error("Could not prepare photo"));
+          return;
+        }
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.8));
+      };
+      image.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function AppearPhotoCard() {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/appear", { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.imageUrl) setImageUrl(data.imageUrl);
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return;
+    setBusy(true);
+    setStatus("");
+    try {
+      const compressed = await compressAppearPhoto(file);
+      const res = await fetch("/api/admin/appear", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ imageUrl: compressed }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setStatus(data.error || "Upload failed");
+        return;
+      }
+      setImageUrl(compressed);
+      setStatus("Saved. The A button can add this person to photos.");
+    } catch {
+      setStatus("Upload failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleClear = async () => {
+    setBusy(true);
+    setStatus("");
+    try {
+      const res = await fetch("/api/admin/appear", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        setStatus("Could not remove photo");
+        return;
+      }
+      setImageUrl(null);
+      setStatus("Removed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-md border border-border p-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt="Appear person"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center font-mono text-lg text-muted-foreground">
+            A
+          </div>
+        )}
+      </div>
+      <div className="flex-1 space-y-2">
+        <div>
+          <h2 className="font-medium">Appear person</h2>
+          <p className="text-sm text-muted-foreground">
+            Upload one portrait. When a guest turns on A, this person is added
+            into their photo.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Label className="inline-flex">
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              disabled={busy}
+              onChange={(event) => {
+                void handleFile(event.target.files?.[0]);
+                event.target.value = "";
+              }}
+            />
+            <span className="inline-flex h-9 items-center rounded-md border border-input bg-background px-3 text-sm">
+              {busy ? "Saving…" : imageUrl ? "Replace photo" : "Upload photo"}
+            </span>
+          </Label>
+          {imageUrl && (
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={busy}
+              onClick={() => void handleClear()}
+            >
+              Remove
+            </Button>
+          )}
+        </div>
+        {status && <p className="text-sm text-muted-foreground">{status}</p>}
       </div>
     </div>
   );

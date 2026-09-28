@@ -97,6 +97,9 @@ interface CameraCaptureProps {
   filters: Filter[];
   model: ModelId;
   onModelChange: (model: ModelId) => void;
+  appearEnabled: boolean;
+  appearConfigured: boolean;
+  onAppearChange: (enabled: boolean) => void;
 }
 
 export function CameraCapture({
@@ -106,6 +109,9 @@ export function CameraCapture({
   filters,
   model,
   onModelChange,
+  appearEnabled,
+  appearConfigured,
+  onAppearChange,
 }: CameraCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -368,6 +374,27 @@ export function CameraCapture({
           </div>
 
           <div className="flex items-center space-x-2 ml-auto">
+            <LiquidGlass
+              variant="button"
+              intensity="medium"
+              onClick={() => {
+                if (!appearConfigured) return;
+                onAppearChange(!appearEnabled);
+              }}
+              className={`rounded-full w-10 h-10 p-0 flex items-center justify-center ${
+                appearEnabled
+                  ? "text-yellow-400"
+                  : appearConfigured
+                  ? "text-white"
+                  : "text-white/35"
+              }`}
+              style={{ borderRadius: "50%" }}
+            >
+              <span className="font-mono text-sm font-semibold leading-none">
+                A
+              </span>
+            </LiquidGlass>
+
             <LiquidGlass
               variant="button"
               intensity="medium"

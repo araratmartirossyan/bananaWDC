@@ -111,14 +111,14 @@ export function getModelWaitHint(id: ModelId): string {
 export function buildEditInput(
   id: ModelId,
   prompt: string,
-  imageUrl: string
+  imageUrls: string[]
 ): Record<string, unknown> {
   const extraInput =
     "extraInput" in MODEL_BY_ID[id] ? MODEL_BY_ID[id].extraInput : undefined;
 
   return {
     prompt,
-    image_urls: [imageUrl],
+    image_urls: imageUrls,
     num_images: 1,
     ...extraInput,
   };

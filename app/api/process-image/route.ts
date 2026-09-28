@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { fal } from "@fal-ai/client";
 import { rateLimiter, getClientIP } from "@/lib/rate-limiter";
 import { getFilterPrompt } from "@/lib/filters-store";
+import { APPEAR_INSTRUCTION, getAppearPhoto } from "@/lib/appear-store";
 import {
   buildEditInput,
   getModelEndpoint,
@@ -40,7 +41,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { imageUrl, filter, model: requestModel } = await request.json();
+    const {
+      imageUrl,
+      filter,
+      model: requestModel,
+      includeAppear,
+    } = await request.json();
 
     if (!imageUrl || !filter) {
       return NextResponse.json(
@@ -51,8 +57,9 @@ export async function POST(request: NextRequest) {
 
     const model = resolveModelId(requestModel);
     const endpoint = getModelEndpoint(model);
+    const withAppear = includeAppear === true;
 
-    if (filter === "none") {
+    if (filter === "none" && !withAppear) {
       return NextResponse.json(
         { processedImageUrl: imageUrl },
         {
@@ -68,16 +75,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = await getFilterPrompt(filter);
+    let prompt =
+      filter === "none"
+        ? "Keep the first photo as a realistic photograph."
+        : await getFilterPrompt(filter);
     if (prompt === null || prompt === "") {
       return NextResponse.json({ error: "Invalid filter" }, { status: 400 });
+    }
+
+    const imageUrls = [imageUrl];
+    if (withAppear) {
+      const appearPhoto = await getAppearPhoto();
+      if (!appearPhoto) {
+        return NextResponse.json(
+          { error: "Appear photo is not set. Upload it in the admin dashboard." },
+          { status: 400 }
+        );
+      }
+      imageUrls.push(appearPhoto);
+      prompt = `${prompt}\n\n${APPEAR_INSTRUCTION}`;
     }
 
     console.log("weDat Processing image with", endpoint, ":", filter);
     console.log("weDat Using dramatic transformation prompt");
 
     const result = await fal.subscribe(endpoint, {
-      input: buildEditInput(model, prompt, imageUrl),
+      input: buildEditInput(model, prompt, imageUrls),
     });
 
     console.log("weDat Nano Banana transformation result:", result);
